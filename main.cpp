@@ -1,5 +1,7 @@
 #include <iostream>
 #include <complex>
+#include <thread>
+#include <chrono>
 
 #include "fastfouriertransform3d.h"
 
@@ -29,14 +31,19 @@ int main()
         for(int j=0;j<data.size_y();j++){
             for(int i=0;i<data.size_x();i++){
                 data.setValue(i,j,k,std::complex<DATA_TYPE>
-                              (cos(2*M_PI*i*0.123+0.1),0)
+                              //(cos(2*M_PI*i*0.123+0.1),0)
+                              (0,0)
                               );
             }
         }
     }
 
 
-    FFT3D::FastFourierTransform3D fft3d ;
+    FFT3D::FastFourierTransform3D fft3d(&data);
+    fft3d.setNumberOfThreads(4);
+    fft3d.calculate();
+
+    //std::this_thread::sleep_for((std::chrono::duration<int>)2);
 
     output_cube(&data,false);
 
