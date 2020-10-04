@@ -1,6 +1,8 @@
 #include "fastfouriertransform3d.h"
 
-FastFourierTransform3D::FastFourierTransform3D()
-{
+using namespace FFT3D;
 
+FastFourierTransform3D::FastFourierTransform3D(Data *data)
+{
+    setData(data);
 }
