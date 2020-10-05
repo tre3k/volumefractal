@@ -12,7 +12,7 @@
 #include <iostream>
 
 namespace FFT3D {
-#define DATA_TYPE long double
+#define DATA_TYPE double
 
 class Data{
 private:
@@ -23,9 +23,11 @@ protected:
 
 
 public:
-    explicit Data(unsigned int size_x, unsigned int size_y, unsigned int size_z){
-        _data = new std::complex<DATA_TYPE> [size_x*size_y*size_z];
-        _size_x = size_x; _size_y = size_y; _size_z = size_z;
+    explicit Data(unsigned int size){
+        _size_x = size;
+        _size_y = _size_x;
+        _size_z = _size_x;
+        _data = new std::complex<DATA_TYPE> [_size_x*_size_y*_size_z];
     }
     ~Data(){
         delete [] _data;
