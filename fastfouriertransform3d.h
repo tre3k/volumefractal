@@ -64,13 +64,13 @@ public:
     }
 
     std::complex<DATA_TYPE> getDepth(unsigned int k,unsigned int num){
-        unsigned int j = (int)(num/_size_z);
-        unsigned int i = num - k*_size_z;
+        unsigned int j = (int)(num/_size_x);
+        unsigned int i = num - j*_size_x;
         return getValue(i,j,k);
     }
     void setDepth(unsigned int k,unsigned int num,std::complex<DATA_TYPE> val){
-        unsigned int i = (int)(num/_size_y);
-        unsigned int j = num - i*_size_y;
+        unsigned int j = (int)(num/_size_x);
+        unsigned int i = num - j*_size_x;
         return setValue(i,j,k,val);
     }
 
@@ -84,12 +84,33 @@ public:
 
 };
 
+enum Permutations{
+    P_CLASSIC,                 //  0 ..... fd/2 ....... fd
+    P_CENTER_ZERO              // -fd/2 ..... 0 ..... fd/2  [fd -  freq. of discret.]
+};
+
+enum Direction{
+    T_DIRECT_FFT,
+    T_INVERSE_FFT
+};
+
+enum Type{
+    FFT_ROW,
+    FFT_COLUMN,
+    FFT_DEPTH
+};
+
 class FastFourierTransform3D
 {
 private:
     Data *_data {nullptr};
     std::vector<std::thread *> threads;
     unsigned int _n_threads {1};
+    std::complex<DATA_TYPE> *_w {nullptr};    // Fourier constants
+    unsigned int *_p {nullptr};
+    std::complex<DATA_TYPE> _coeff {1,0};
+
+    unsigned int _size {0}, _bits{0};
 
     void ThreadRows(unsigned int id);
     void ThreadColumns(unsigned int id);
@@ -111,13 +132,20 @@ public:
 
     void setData(Data *data = nullptr){
         _data = data;
+        _size = data->size_x();
+        _bits = log2(_size);
     }
 
     void setNumberOfThreads(unsigned int n_threads){_n_threads = n_threads;}
 
     void calculate(void);
-};
+    void fft(unsigned int type = Type::FFT_ROW ,unsigned int index = 0);
 
+
+    void GenerateFFTConsts(bool inverse = false);
+    void GeneratePermutation(int type);
+
+};
 
 }
 
