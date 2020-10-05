@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru
+ * 3D Fast Fourier Transform, License: GPLv3
+ */
+
 #include "fastfouriertransform3d.h"
 
 using namespace FFT3D;
@@ -13,29 +18,20 @@ FastFourierTransform3D::FastFourierTransform3D(Data *data)
 
 void FastFourierTransform3D::ThreadRows(unsigned int id){
     unsigned int n_rows = _data->size_y()*_data->size_z();
-
     /* FFT for all row */
     for(int row=id;row<n_rows;row+=_n_threads)  fft(Type::FFT_ROW,row);
 }
 
 void FastFourierTransform3D::ThreadColumns(unsigned int id){
     unsigned int n_columns = _data->size_x()*_data->size_z();
-
     /* FFT for all column */
     for(int column=id;column<n_columns;column+=_n_threads) fft(Type::FFT_COLUMN,column);
-
 }
 
 void FastFourierTransform3D::ThreadDepth(unsigned int id){
     unsigned int n_depth =_data->size_x()*_data->size_y();
     /* FFT for all depth */
     for(int depth=id;depth<n_depth;depth+=_n_threads) fft(Type::FFT_DEPTH,depth);
-    //_data->setDepth(3,2,std::complex<DATA_TYPE>(99,99));
-    //_data->setValue(0,2,3,std::complex<DATA_TYPE>(99,99));
-
-    //for(int depth=id;depth<n_depth;depth+=_n_threads) _data->setDepth(2,depth,std::complex<DATA_TYPE>(4,4));
-    //for(int i=0;i<_size;i++) _data->setDepth(i,8,std::complex<DATA_TYPE>(4,4));
-
 }
 
 void FastFourierTransform3D::calculate(){
@@ -43,31 +39,40 @@ void FastFourierTransform3D::calculate(){
     std::thread *th;
 
     /* Calculate FFT for all rows */
+    auto t_start = std::chrono::high_resolution_clock::now();
     for(int i=0;i<_n_threads;i++){
         th = new std::thread(&FastFourierTransform3D::ThreadRows,this,i);
         threads.push_back(th);
     }
     // wait for complete
     for(auto thread : threads) thread->join();
+    auto t_stop = std::chrono::high_resolution_clock::now();
     threads.clear();
+    std::cout << "FFT for rows is complete. "  << (t_stop-t_start).count()/1000 << " us." << std::endl;
 
     /* Calculate FFT for all columns */
+    t_start = std::chrono::high_resolution_clock::now();
     for(int i=0;i<_n_threads;i++){
         th = new std::thread(&FastFourierTransform3D::ThreadColumns,this,i);
         threads.push_back(th);
     }
     // wait for all threads complete
     for(auto thread : threads) thread->join();
+    t_stop = std::chrono::high_resolution_clock::now();
     threads.clear();
+    std::cout << "FFT for columns is complete. " << (t_stop-t_start).count()/1000 << " us." << std::endl;
 
     /* Calculate FFT for all depth */
+    t_start = std::chrono::high_resolution_clock::now();
     for(int i=0;i<_n_threads;i++){
         th = new std::thread(&FastFourierTransform3D::ThreadDepth,this,i);
         threads.push_back(th);
     }
     // wait for complete
     for(auto thread : threads) thread->join();
+    t_stop = std::chrono::high_resolution_clock::now();
     threads.clear();
+    std::cout << "FFT for depth is complete. " << (t_stop-t_start).count()/1000 << " us." << std::endl;
 }
 
 
@@ -119,7 +124,7 @@ void FastFourierTransform3D::fft(unsigned int type, unsigned int index) {
         step++;
     }
 
-    /* copy */
+    /* copy with premutation */
     for(int i=0;i<_size;i++){
         switch(type){
             case Type::FFT_ROW:

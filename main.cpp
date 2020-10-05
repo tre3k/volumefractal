@@ -1,6 +1,10 @@
+/*
+ * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru
+ * 3D Fast Fourier Transform, License: GPLv3
+ */
+
 #include <iostream>
 #include <complex>
-#include <thread>
 #include <chrono>
 
 #include "fastfouriertransform3d.h"
@@ -22,36 +26,33 @@ void output_cube(FFT3D::Data *data, bool magnitude = false){
     }
 }
 
-int main()
-{
-    FFT3D::Data data(4,4,4);
+int main(int argc,char *argv[]){
+    FFT3D::Data data(1024,1024,1024);
 
     /* set array */
     for(int k=0;k<data.size_z();k++){
         for(int j=0;j<data.size_y();j++){
             for(int i=0;i<data.size_x();i++){
                 data.setValue(i,j,k,std::complex<DATA_TYPE>
-                              (cos(2*M_PI*i*0.25+0.1),0)
+                              (cos(2*M_PI*k*0.25+0.1),0)
                               //(0,0)
                               );
             }
         }
     }
 
-
-
     FFT3D::FastFourierTransform3D fft3d(&data);
-    fft3d.setNumberOfThreads(1);
+    fft3d.setNumberOfThreads(8);
 
     fft3d.GenerateFFTConsts();
     fft3d.GeneratePermutation(FFT3D::Permutations::P_CENTER_ZERO);
     //fft3d.GeneratePermutation(FFT3D::Permutations::P_CLASSIC);
 
+    auto t_start = std::chrono::high_resolution_clock::now();
     fft3d.calculate();
+    auto t_stop = std::chrono::high_resolution_clock::now();
+    std::cout << "total time: " << (t_stop-t_start).count()/1000 << " us\n";
 
-    //std::this_thread::sleep_for((std::chrono::duration<int>)2);
-
-    output_cube(&data,true);
-
+    //output_cube(&data,true);
     return 0;
 }

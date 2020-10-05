@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru
+ * 3D Fast Fourier Transform, License: GPLv3
+ */
+
 #ifndef FASTFOURIERTRANSFORM3D_H
 #define FASTFOURIERTRANSFORM3D_H
 
