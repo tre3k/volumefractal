@@ -26,7 +26,7 @@ void output_cube(FFT3D::Data *data, bool magnitude = false){
     }
 }
 
-void benchmark(unsigned int size, unsigned int max_thread){
+void benchmark(unsigned int size, unsigned int threads){
     FFT3D::Data data(size);
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time,midle_time,end_time;
 
@@ -44,38 +44,35 @@ void benchmark(unsigned int size, unsigned int max_thread){
     end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Initial array: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
 
-    for(int threads = 1; threads <= max_thread; threads = threads*2){
-        std::cout << "\033[1mThreads: " << threads << "\033[0m\n";
-        start_time = std::chrono::high_resolution_clock::now();
+    std::cout << "\033[1mThreads: " << threads << "\033[0m\n";
+    start_time = std::chrono::high_resolution_clock::now();
 
-        FFT3D::FastFourierTransform3D *fft = new FFT3D::FastFourierTransform3D(&data);
-        fft->setNumberOfThreads(threads);
-        fft->GenerateFFTConsts();
-        fft->GeneratePermutation(FFT3D::Permutations::P_CENTER_ZERO);
+    FFT3D::FastFourierTransform3D *fft = new FFT3D::FastFourierTransform3D(&data);
+    fft->setNumberOfThreads(threads);
+    fft->GenerateFFTConsts();
+    fft->GeneratePermutation(FFT3D::Permutations::P_CENTER_ZERO);
 
-        midle_time = std::chrono::high_resolution_clock::now();
-        fft->calculate();
-        end_time = std::chrono::high_resolution_clock::now();
+    midle_time = std::chrono::high_resolution_clock::now();
+    fft->calculate();
+    end_time = std::chrono::high_resolution_clock::now();
 
-        std::cout << std::endl << "Initial Time: " << (double)(midle_time-start_time).count()/1000000.0 << " ms" << std::endl;
-        std::cout << "Calculation Time: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
+    std::cout << std::endl << "Initial Time: " << (double)(midle_time-start_time).count()/1000000.0 << " ms" << std::endl;
+    std::cout << "Calculation Time: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
 
-        //output_cube(&data,true);
-
-        delete fft;
-    }
+    //output_cube(&data,true);
+    delete fft;
 }
 
 int main(int argc,char *argv[]){
-    unsigned int opt_size{512};
-    unsigned int opt_threads{8};
+    unsigned int opt_size{1024};
+    unsigned int opt_threads{6};
 
     long long ram_size = sizeof(DATA_TYPE)*2*(opt_size*opt_size*opt_size+opt_size*opt_threads);
 
     std::cout << "On current system DATA_TYPE size: " << sizeof(DATA_TYPE) << " bytes or " << sizeof(DATA_TYPE)*8 << " bits" << std::endl;
-    std::cout << "you need RAM size: " << ram_size << " bytes" << std::endl;
+    std::cout << "you need RAM size: " << ram_size << " bytes" << std::endl << std::endl;
 
-    benchmark(512,opt_threads);
+    benchmark(opt_size,opt_threads);
 
     return 0;
 }
