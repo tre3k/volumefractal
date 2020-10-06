@@ -26,6 +26,7 @@ void output_cube(FFT3D::Data *data, bool magnitude = false){
     }
 }
 
+
 void benchmark(unsigned int size, unsigned int threads){
     FFT3D::Data data(size);
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time,midle_time,end_time;
@@ -53,17 +54,16 @@ void benchmark(unsigned int size, unsigned int threads){
     fft->GeneratePermutation(FFT3D::Permutations::P_CENTER_ZERO);
 
     midle_time = std::chrono::high_resolution_clock::now();
-    //fft->calculate();
+    fft->calculate();
     end_time = std::chrono::high_resolution_clock::now();
 
     std::cout << std::endl << "Initial Time: " << (double)(midle_time-start_time).count()/1000000.0 << " ms" << std::endl;
     std::cout << "Calculation Time: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
 
-
-    //data.WriteToRawFile("1.dat");
-    output_cube(&data,true);
+    //output_cube(&data,true);
     delete fft;
 }
+
 
 int main(int argc,char *argv[]){
     unsigned int opt_size{8};
@@ -75,7 +75,6 @@ int main(int argc,char *argv[]){
     std::cout << "you need RAM size: " << ram_size << " bytes" << std::endl << std::endl;
 
     benchmark(opt_size,opt_threads);
-
 
     return 0;
 }

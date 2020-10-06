@@ -34,7 +34,7 @@ enum Type{
 class FastFourierTransform3D
 {
 private:
-    Data *_data {nullptr};
+    Data* _data {nullptr};
     std::vector<std::thread *> threads;
     unsigned int _n_threads {1};
     std::complex<DATA_TYPE> *_w {nullptr};    // Fourier constants

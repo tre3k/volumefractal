@@ -8,6 +8,7 @@
 
 #include <complex>
 #include <string>
+#include <iostream>
 
 namespace FFT3D {
 #define DATA_TYPE double
@@ -18,14 +19,14 @@ namespace FFT3D {
 
         struct s_raw_file_header{
             unsigned int size;
-            unsigned int data_type;
+            size_t hash_data_type;
         };
 
     protected:
         unsigned long int _size_x {0}, _size_y {0}, _size_z {0};
 
     public:
-        explicit Data(unsigned long int size);
+        Data(unsigned long int size);
         ~Data(){
             delete [] _data;
         }
@@ -33,12 +34,6 @@ namespace FFT3D {
         unsigned int getIndex(unsigned long int i,unsigned long int j,unsigned long int k){
             unsigned long int index {0};
             index = i + j*_size_y + k*_size_y*_size_z;
-            /*
-            if(index >= _size_x*_size_y*_size_z){
-                // and set error
-                index = 0;
-            }
-            */
             return index;
         }
 
@@ -50,6 +45,7 @@ namespace FFT3D {
             unsigned int j = num - k*_size_y;
             return getValue(i,j,k);
         }
+
         void setRow(unsigned int i,unsigned int num,std::complex<DATA_TYPE> val){
             unsigned int k = (int)(num/_size_y);
             unsigned int j = num - k*_size_y;
@@ -87,14 +83,10 @@ namespace FFT3D {
         unsigned int size_z(){return _size_z;}
 
         void WriteToRawFile(std::string filename);
+        void ReadFromRawFile(std::string filename);
 
     };
 
-    enum DataType{
-        DT_FLOAT,
-        DT_DOUBLE,
-        DT_LONG_DOUBLE
-    };
 
 }
 #endif

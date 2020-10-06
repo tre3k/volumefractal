@@ -79,7 +79,7 @@ void FastFourierTransform3D::calculate(){
 void FastFourierTransform3D::fft(unsigned int type, unsigned int index) {
     int n2 = _size/2;
     int step = 1;
-    int shift = 0,p = 0, base = 0;
+    int shift = 0, p = 0, base = 0;
     int factor = 0;
 
     int i1,i2;
@@ -108,7 +108,7 @@ void FastFourierTransform3D::fft(unsigned int type, unsigned int index) {
         for(int l=0;l<(1<<step-1);l++){
             shift = _bits-step+1;
             base = (1<<shift);
-            factor = _size/base;
+            factor = _size/base;                // base - основание (W^p)_base
 
             for(int i=0;i<n2;i++){
                 i1 = i+l*base;
@@ -156,10 +156,7 @@ void FastFourierTransform3D::GenerateFFTConsts(bool inverse) {
 void FastFourierTransform3D::GeneratePermutation(int type) {
     unsigned int temp {0};
     int size, bits;
-    /*
-    size = _data->size_x();
-    bits = log2(size);
-    */
+
     size = _size;
     bits = _bits;
     for(int i=0;i<_size;i++) _p[i] = 0;

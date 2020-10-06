@@ -19,9 +19,23 @@ void Data::WriteToRawFile(std::string filename) {
 
     s_raw_file_header header;
     header.size = _size_x;
-    header.data_type=1;
+    header.hash_data_type = typeid(DATA_TYPE).hash_code();
+
     std::fwrite(&header,1,sizeof(s_raw_file_header),f);
     std::fwrite(_data,sizeof(std::complex<DATA_TYPE>),header.size*header.size*header.size,f);
 
+    std::fclose(f);
+}
+
+void Data::ReadFromRawFile(std::string filename){
+    std::FILE *f = std::fopen(filename.c_str(),"r");
+
+    s_raw_file_header header;
+    std::fread(&header,1,sizeof(s_raw_file_header),f);
+
+    if(_data!=nullptr) delete _data;
+
+    _data = new std::complex<DATA_TYPE>;
+    std::fread(_data,sizeof(std::complex<DATA_TYPE>),header.size*header.size*header.size,f);
     std::fclose(f);
 }
