@@ -7,6 +7,7 @@
 #define FFT3DDATA_H
 
 #include <complex>
+#include <string>
 
 namespace FFT3D {
 #define DATA_TYPE double
@@ -14,6 +15,11 @@ namespace FFT3D {
     class Data{
     private:
         std::complex<DATA_TYPE> *_data {nullptr};
+
+        struct s_raw_file_header{
+            unsigned int size;
+            unsigned int data_type;
+        };
 
     protected:
         unsigned long int _size_x {0}, _size_y {0}, _size_z {0};
@@ -79,6 +85,16 @@ namespace FFT3D {
         unsigned int size_x(){return _size_x;}
         unsigned int size_y(){return _size_y;}
         unsigned int size_z(){return _size_z;}
+
+        void WriteToRawFile(std::string filename);
+
     };
+
+    enum DataType{
+        DT_FLOAT,
+        DT_DOUBLE,
+        DT_LONG_DOUBLE
+    };
+
 }
 #endif
