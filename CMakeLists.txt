@@ -7,4 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O3 -march=native")
 
-add_executable(fft3d main.cpp fastfouriertransform3d.cpp fastfouriertransform3d.h)
+add_executable(fft3d
+                main.cpp
+                fastfouriertransform3d.cpp fastfouriertransform3d.h
+                fft3ddata.cpp fft3ddata.h)

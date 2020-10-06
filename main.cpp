@@ -59,15 +59,15 @@ void benchmark(unsigned int size, unsigned int threads){
     std::cout << std::endl << "Initial Time: " << (double)(midle_time-start_time).count()/1000000.0 << " ms" << std::endl;
     std::cout << "Calculation Time: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
 
-    //output_cube(&data,true);
+    output_cube(&data,true);
     delete fft;
 }
 
 int main(int argc,char *argv[]){
-    unsigned int opt_size{1024};
+    unsigned int opt_size{8};
     unsigned int opt_threads{6};
 
-    long long ram_size = sizeof(DATA_TYPE)*2*(opt_size*opt_size*opt_size+opt_size*opt_threads);
+    unsigned long int ram_size = sizeof(DATA_TYPE)*2*(opt_size*opt_size*opt_size+opt_size*opt_threads);
 
     std::cout << "On current system DATA_TYPE size: " << sizeof(DATA_TYPE) << " bytes or " << sizeof(DATA_TYPE)*8 << " bits" << std::endl;
     std::cout << "you need RAM size: " << ram_size << " bytes" << std::endl << std::endl;
