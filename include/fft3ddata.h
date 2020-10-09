@@ -27,7 +27,7 @@ namespace FFT3D {
         }
         unsigned long size(void){return _size;}
         std::complex<DATA_TYPE> getValue(unsigned long i,unsigned long j){
-            unsigned long index = j+i*_size;
+            unsigned long index = i + j*_size;
             return _data[index];
         }
 

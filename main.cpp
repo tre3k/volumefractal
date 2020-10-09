@@ -66,29 +66,43 @@ std::string human_size(unsigned long size){
     return retval;
 }
 
-void benchmark(unsigned int size, unsigned int threads,std::string filename){
+void benchmark(unsigned int size, unsigned int threads,std::string filename,std::string in_filename){
     std::cout << std::endl << "Benchmark..." << std::endl;
     FFT3D::Data data(size);
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time,midle_time,end_time;
+
+    std::complex<DATA_TYPE> value;
 
     start_time = std::chrono::high_resolution_clock::now();
     for(int k=0;k<data.size_z();k++){
         for(int j=0;j<data.size_y();j++){
             for(int i=0;i<data.size_x();i++){
-                data.setValue(i,j,k,std::complex<DATA_TYPE>
-                              (cos(2*M_PI*i*0.25+0.1),0)
-                              //(0,0)
-                              );
+                value = {cos(2*M_PI*i*0.123+2*M_PI*j*0.123+2*M_PI*k*0.123),0};
+                data.setValue(i,j,k,value);
+
+                /*
+                if(cos(2*M_PI*i*0.125+2*M_PI*j*0.125*M_PI*k*0.125) > 0.0){
+                    data.setValue(i,j,k,std::complex<DATA_TYPE>(1.0,0));
+                }else{
+                    data.setValue(i,j,k,std::complex<DATA_TYPE>(-1.0,0));
+                }
+                 */
             }
         }
     }
-
     end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Initial array: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
 
-    std::cout << "\033[1mThreads: " << threads << "\033[0m\n";
-    start_time = std::chrono::high_resolution_clock::now();
+    if(in_filename!=""){
+        std::cout << "Write to file " << in_filename << "..." << std::endl;
+        start_time = std::chrono::high_resolution_clock::now();
+        data.WriteToRawFile(in_filename);
+        end_time = std::chrono::high_resolution_clock::now();
+        double speed = data.FileSize()/(double)(end_time-start_time).count()/1e-9;
+        std::cout << "Write file time: " << (double)(end_time-start_time).count()/1000000.0 << " ms ("<< human_size(speed) << "/s)" << std::endl << std::endl;
+    }
 
+    start_time = std::chrono::high_resolution_clock::now();
     FFT3D::FastFourierTransform3D *fft = new FFT3D::FastFourierTransform3D(&data);
     fft->setNumberOfThreads(threads);
     fft->GenerateFFTConsts();
@@ -174,6 +188,7 @@ int main(int argc,char *argv[]){
         size = data.size_x();
     }
     std::cout << "Size: " << size << "x" << size << "x" << size << std::endl;
+    std::cout << "\033[1mThreads: " << opt_threads << "\033[0m\n";
     std::cout << "On current system DATA_TYPE size: " << sizeof(DATA_TYPE) << " bytes or " << sizeof(DATA_TYPE)*8 << " bits" << std::endl;
     unsigned long long ram_size = sizeof(std::complex<DATA_TYPE>)*(size*size*size+size*opt_threads);
     std::cout << "you need RAM size: " << ram_size << " bytes (" << human_size(ram_size) << ")" << std::endl;
@@ -190,7 +205,7 @@ int main(int argc,char *argv[]){
         }
     }
     if(opt_benchmark!=0){
-        benchmark(size,opt_threads,opt_out_filename);
+        benchmark(size,opt_threads,opt_out_filename,opt_in_filename);
         std::cout << "Exiting." << std::endl;
         return 0;
     }
