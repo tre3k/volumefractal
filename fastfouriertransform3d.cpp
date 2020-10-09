@@ -146,10 +146,10 @@ void FastFourierTransform3D::fft(unsigned int type, unsigned int index) {
 void FastFourierTransform3D::GenerateFFTConsts(bool inverse) {
     if(!inverse){
         _coeff = {(DATA_TYPE)(1.0/_size),0};
-        for(int i=0;i<_size/2;i++) _w[i] = {cos(-2 * M_PI * i / _size), sin(-2 * M_PI * i / _size)};
+        for(int i=0;i<_size/2;i++) _w[i] = std::complex<DATA_TYPE>{cos(-2.0 * M_PI * i / _size), sin(-2.0 * M_PI * i / _size)};
     }else{
         _coeff = {(DATA_TYPE)1,0};
-        for(int i=0;i<_size/2;i++) _w[i] = {cos(2 * M_PI * i / _size), sin(2 * M_PI * i / _size)};
+        for(int i=0;i<_size/2;i++) _w[i] = std::complex<DATA_TYPE>{cos(2.0 * M_PI * i / _size), sin(2.0 * M_PI * i / _size)};
     }
 }
 
