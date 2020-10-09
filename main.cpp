@@ -174,7 +174,6 @@ int main(int argc,char *argv[]){
         size = data.size_x();
     }
     std::cout << "Size: " << size << "x" << size << "x" << size << std::endl;
-    std::cout << "Threads: " << opt_threads << std::endl;
     std::cout << "On current system DATA_TYPE size: " << sizeof(DATA_TYPE) << " bytes or " << sizeof(DATA_TYPE)*8 << " bits" << std::endl;
     unsigned long long ram_size = sizeof(std::complex<DATA_TYPE>)*(size*size*size+size*opt_threads);
     std::cout << "you need RAM size: " << ram_size << " bytes (" << human_size(ram_size) << ")" << std::endl;
