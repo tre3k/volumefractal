@@ -55,3 +55,15 @@ void Data::ReadOnlyHeader(std::string filename) {
     std::fclose(f);
 
 }
+
+void Data::ReadDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth) {
+    std::FILE *f = std::fopen(filename.c_str(),"r");
+
+    s_raw_file_header header;
+    std::fread(&header,1,sizeof(s_raw_file_header),f);
+    data->Init(header.size);
+    std::fseek(f,num_depth*header.size*header.size*sizeof(std::complex<DATA_TYPE>),SEEK_CUR);
+    std::fread(data->data(),sizeof(std::complex<DATA_TYPE>),header.size*header.size,f);
+
+    std::fclose(f);
+}

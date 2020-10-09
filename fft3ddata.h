@@ -13,6 +13,26 @@
 namespace FFT3D {
 #define DATA_TYPE double
 
+    class Data2D{
+    private:
+        unsigned long _size {0};
+        std::complex<DATA_TYPE> *_data {nullptr};
+    public:
+        Data2D(unsigned long size){Init(size);}
+        std::complex<DATA_TYPE> *data(){return _data;}
+        void Init(unsigned long size){
+            _size = size;
+            if(_data!= nullptr) delete _data;
+            _data = new std::complex<DATA_TYPE>[size*size];
+        }
+        unsigned long size(void){return _size;}
+        std::complex<DATA_TYPE> getValue(unsigned long i,unsigned long j){
+            unsigned long index = j+i*_size;
+            return _data[index];
+        }
+
+    };
+
     class Data{
     private:
         std::complex<DATA_TYPE> *_data {nullptr};
@@ -85,11 +105,13 @@ namespace FFT3D {
         void WriteToRawFile(std::string filename);
         void ReadFromRawFile(std::string filename);
         void ReadOnlyHeader(std::string filename);
+        static void ReadDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth);
         unsigned long long FileSize(void){
             return sizeof(s_raw_file_header)+_size_x*_size_y*_size_z*sizeof(std::complex<DATA_TYPE>);
         }
 
     };
+
 
 
 }
