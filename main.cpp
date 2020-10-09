@@ -125,23 +125,6 @@ void help(std::string prg){
 }
 
 int main(int argc,char *argv[]){
-    // for test data2d
-
-    FFT3D::Data2D *data2d = new FFT3D::Data2D(0);
-    FFT3D::Data::ReadDepthFromFile("1.dat",data2d,4);
-
-    for(int i=0;i<data2d->size();i++){
-        for(int j=0;j<data2d->size();j++){
-            std::cout << data2d->getValue(i,j) << "\t";
-        }
-        std::cout << "\n";
-    }
-
-
-    FFT3D::Data *data2 = new FFT3D::Data(0);
-    data2->ReadFromRawFile("cos25.dat");
-    output_cube(data2);
-
     unsigned long size{0};
     unsigned long opt_benchmark{0};
     unsigned int opt_threads{1};
