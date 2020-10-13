@@ -53,6 +53,7 @@ void Widgets::Viewer::ShowDepth(int depth){
     for(int i=0;i<size;i++){
         for(int j=0;j<size;j++){
             plot_case_ampl->plot2D->ColorMap->data()->setCell(i,j,abs(_data->getValue(i,j)));
+            //plot_case_ampl->plot2D->ColorMap->data()->setCell(i,j,_data->getValue(i,j).real());
         }
     }
 

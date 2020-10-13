@@ -60,6 +60,7 @@ private:
         QMenuBar *menu_bar;
         QMenu *file_menu;
         QAction *open;
+        QAction *exit;
     } menu_bar;
 
     void BuildMenu(void){
@@ -71,8 +72,13 @@ private:
         menu_bar.open = new QAction("&Open");
         menu_bar.file_menu->addAction(menu_bar.open);
 
+
+        menu_bar.exit= new QAction("&Exit");
+        menu_bar.file_menu->addAction(menu_bar.exit);
+
         this->setMenuBar(menu_bar.menu_bar);
         connect(menu_bar.open,SIGNAL(triggered()),this,SLOT(OpenFile()));
+        connect(menu_bar.exit,SIGNAL(triggered()),this,SLOT(close()));
     }
 
     /* filename */
@@ -95,7 +101,6 @@ public slots:
         viewer->setFileName(filename);
         viewer->SetMaxDepth(size);
         viewer->setCurrentDepth(size/2);
-        //viewer->ShowDepth(size/2);
     }
 
 
