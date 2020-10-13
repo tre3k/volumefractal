@@ -77,9 +77,13 @@ void benchmark(unsigned int size, unsigned int threads,std::string filename,std:
     for(int k=0;k<data.size_z();k++){
         for(int j=0;j<data.size_y();j++){
             for(int i=0;i<data.size_x();i++){
-                value = {cos(2*M_PI*i*0.123+2*M_PI*j*0.123+2*M_PI*k*0.123),0};
+                if((cos(2*M_PI*0.025*i)+cos(2*M_PI*0.025*j)+cos(2*M_PI*0.025*k))>=0){
+                    value = {1,0};
+                }else{
+                    value = {-1,0};
+                }
+                //value = {cos(2*M_PI*i*0.123+2*M_PI*j*0.123+2*M_PI*k*0.123),0};
                 data.setValue(i,j,k,value);
-
                 /*
                 if(cos(2*M_PI*i*0.125+2*M_PI*j*0.125*M_PI*k*0.125) > 0.0){
                     data.setValue(i,j,k,std::complex<DATA_TYPE>(1.0,0));
@@ -133,7 +137,7 @@ void help(std::string prg){
     std::cout << "\t-in <filename>\r\t\t\t\tinput filename" << std::endl;
     std::cout << "\t-out <filename>\r\t\t\t\toutput filename" << std::endl;
     std::cout << "\t-j <num>\r\t\t\t\tnumber of threads" << std::endl;
-    std::cout << "\t-da\r\t\t\t\tdo not ask for confirmation" << std::endl;
+    std::cout << "\t-q\r\t\t\t\tdo not ask for confirmation" << std::endl;
     std::cout << "\t-b <size>\r\t\t\t\tbenchmark for size x size x size" << std::endl;
 
 }
@@ -153,7 +157,7 @@ int main(int argc,char *argv[]){
     CmdLine::Options opt(argc,argv);
     opt.parse("-j",CmdLine::T_INT,&opt_threads);
     opt.parse("-b",CmdLine::T_INT,&opt_benchmark);
-    opt.parse("-da",CmdLine::T_BOOL,&opt_d_accept);
+    opt.parse("-q",CmdLine::T_BOOL,&opt_d_accept);
     opt.parse("-h",CmdLine::T_BOOL,&opt_help);
     opt.parse("-out",CmdLine::T_STRING,&opt_out_filename);
     opt.parse("-in",CmdLine::T_STRING,&opt_in_filename);
