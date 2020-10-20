@@ -56,7 +56,7 @@ void Data::ReadOnlyHeader(std::string filename) {
 
 }
 
-void Data::ReadDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth) {
+void Data::Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth) {
     std::FILE *f = std::fopen(filename.c_str(),"r");
 
     s_raw_file_header header;
@@ -64,6 +64,24 @@ void Data::ReadDepthFromFile(std::string filename, Data2D *data, unsigned long n
     data->Init(header.size);
     std::fseek(f,num_depth*header.size*header.size*sizeof(std::complex<DATA_TYPE>),SEEK_CUR);
     std::fread(data->data(),sizeof(std::complex<DATA_TYPE>),header.size*header.size,f);
+
+    std::fclose(f);
+}
+
+void Data::ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth){
+    std::FILE *f = std::fopen(filename.c_str(),"r");
+
+    s_raw_file_header header;
+    std::fread(&header,1,sizeof(s_raw_file_header),f);
+    data->Init(header.size);
+    unsigned long index = 0;
+    std::complex<DATA_TYPE> tmp;
+    for(int i=0;i<header.size;i++){
+        index = row + i*header.size + depth*header.size*header.size;
+        std::fseek(f,sizeof(s_raw_file_header)+index*sizeof(std::complex<DATA_TYPE>),SEEK_SET);
+        std::fread(&tmp,sizeof(std::complex<DATA_TYPE>),1,f);
+        data->setData(i,tmp);
+    }
 
     std::fclose(f);
 }
