@@ -87,6 +87,7 @@ private:
     Widgets::Viewer *viewer;
 
 public:
+
     explicit MainWindow(QWidget *parent = nullptr);
 
 public slots:

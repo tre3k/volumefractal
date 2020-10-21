@@ -1,5 +1,18 @@
 #include "mainwindow.h"
 
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+{
+    this->setWindowTitle("FFT3D Average");
+    this->setMinimumHeight(400);
+    this->setMinimumWidth(800);
+
+    BuildMenu();
+
+    viewer = new Widgets::Viewer();
+    viewer->setMinimumSize(10,10);
+    this->setCentralWidget(viewer);
+
+}
 
 Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
     layout = new QHBoxLayout();
@@ -24,27 +37,21 @@ Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
     connect(spin_box_depth,SIGNAL(valueChanged(int)),this,SLOT(ShowDepth(int)));
     connect(slider,SIGNAL(valueChanged(int)),spin_box_depth,SLOT(setValue(int)));
 
-
     _data = new FFT3D::Data2D(0);
-
-}
-
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
-{
-    BuildMenu();
-
-    viewer = new Widgets::Viewer();
-    viewer->setMinimumSize(10,10);
-    this->setCentralWidget(viewer);
-
 }
 
 
 void Widgets::Viewer::ShowDepth(int depth){
     if(_filename=="") return;
 
+    FFT3D::Data::Read2DLayerDepthFromFile(_filename.toStdString(),_data,(unsigned long) depth);
 
-    FFT3D::Data::ReadDepthFromFile(_filename.toStdString(),_data,(unsigned long) depth);
+    FFT3D::Data1D *column = new FFT3D::Data1D(0);
+    FFT3D::Data::ReadColumnFromFile(_filename.toStdString(),column,2,depth);
+    qDebug() << "column";
+    for(int i=0;i<column->size();i++){
+        qDebug() << abs((*column)[i]);
+    }
 
     unsigned long size = _data->size();
     plot_case_ampl->plot2D->ColorMap->data()->setSize(size,size);
