@@ -11,6 +11,7 @@
 #include <QHBoxLayout>
 #include <QSlider>
 #include <QSpinBox>
+#include <QTabWidget>
 
 #include "fft3ddata.h"
 #include "iqcustomplot.h"

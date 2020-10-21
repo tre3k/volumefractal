@@ -10,9 +10,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     viewer = new Widgets::Viewer();
     viewer->setMinimumSize(10,10);
-    this->setCentralWidget(viewer);
+    //this->setCentralWidget(viewer);
+
+    QTabWidget *central_tab_widget = new QTabWidget();
+    this->setCentralWidget(central_tab_widget);
+
+    central_tab_widget->addTab(viewer,"Viewer");
 
 }
+
 
 Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
     layout = new QHBoxLayout();
@@ -21,6 +27,7 @@ Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
     plot_case_phase = new iCasePlot2D();
     plot_case_phase->plot2D->ColorScale->axis()->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
     plot_case_ampl->slot_log(true);
+    plot_case_ampl->checkBoxLog->setChecked(true);
 
     slider = new QSlider();
     spin_box_depth = new QSpinBox();
@@ -45,13 +52,6 @@ void Widgets::Viewer::ShowDepth(int depth){
     if(_filename=="") return;
 
     FFT3D::Data::Read2DLayerDepthFromFile(_filename.toStdString(),_data,(unsigned long) depth);
-
-    FFT3D::Data1D *column = new FFT3D::Data1D(0);
-    FFT3D::Data::ReadColumnFromFile(_filename.toStdString(),column,2,depth);
-    qDebug() << "column";
-    for(int i=0;i<column->size();i++){
-        qDebug() << abs((*column)[i]);
-    }
 
     unsigned long size = _data->size();
     plot_case_ampl->plot2D->ColorMap->data()->setSize(size,size);
