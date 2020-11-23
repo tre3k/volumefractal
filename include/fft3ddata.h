@@ -48,6 +48,11 @@ namespace FFT3D {
             unsigned long index = i + j*_size;
             return _data[index];
         }
+        void setValue(unsigned long i,unsigned long j,std::complex<DATA_TYPE> value){
+            unsigned long index = i + j*_size;
+            _data[index] = value;
+            return;
+        }
 
     };
 
