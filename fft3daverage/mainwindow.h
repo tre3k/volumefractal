@@ -101,7 +101,7 @@ public:
 
 public slots:
         void OpenFile(void){
-                filename = QFileDialog::getOpenFileName(nullptr,"Open FFT3D file","","*.dat");
+                filename = QFileDialog::getOpenFileName(nullptr,"Open FFT3D file","","*.raw");
                 if(filename=="") return;
 
                 FFT3D::Data data(0);
