@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O3 -march=native")
 
-set(INCLUDE_PATH "include/")
-include_directories(${INCLUDE_PATH})
+# set(INCLUDE_PATH "include/")
+# include_directories(${INCLUDE_PATH})
 
 add_library(data3d STATIC fft3ddata.cpp ${INCLUDE_PATH}fft3ddata.h)
 
