@@ -8,8 +8,8 @@
 class Processing
 {
 public:
-    Processing();
-    static void cutLayerOz(FFT3D::Data2D *result,std::string filename, double angle);
+        Processing();
+        static void cutLayerOz(FFT3D::Data2D *result,std::string filename, double angle);
 };
 
 #endif // PROCESSING_H

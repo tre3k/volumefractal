@@ -4,8 +4,8 @@ QT += core gui printsupport \
 TARGET = fft3daverage
 TEMPLATE = app
 
-INCLUDEPATH += $$PWD/../fft3d/include
-LIBS += -L$$PWD/../fft3d/build -ldata3d
+INCLUDEPATH += $$PWD/../fft3d
+LIBS += -L$$PWD/../lib -ldata3d
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -19,3 +19,4 @@ HEADERS += \
            qcustomplot.h \
            iqcustomplot.h
 
+DESTDIR = $$PWD/../bin

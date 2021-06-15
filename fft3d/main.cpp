@@ -135,8 +135,8 @@ void benchmark(unsigned int size, unsigned int threads,std::string filename,std:
 void help(std::string prg){
 	std::cout << prg << " [options]" << std::endl;
 	std::cout << "options: " << std::endl;
-	std::cout << "\t-in <filename>\r\t\t\t\tinput filename" << std::endl;
-	std::cout << "\t-out <filename>\r\t\t\t\toutput filename" << std::endl;
+	std::cout << "\t-in <filename>\r\t\t\t\tinput *.raw filename" << std::endl;
+	std::cout << "\t-out <filename>\r\t\t\t\toutput *.raw filename" << std::endl;
 	std::cout << "\t-j <num>\r\t\t\t\tnumber of threads" << std::endl;
 	std::cout << "\t-q\r\t\t\t\tdo not ask for confirmation" << std::endl;
 	std::cout << "\t-b <size>\r\t\t\t\tbenchmark for size x size x size" << std::endl;

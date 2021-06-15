@@ -10,7 +10,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O3 -march=native")
 # set(INCLUDE_PATH "include/")
 # include_directories(${INCLUDE_PATH})
 
-add_library(data3d STATIC fft3ddata.cpp ${INCLUDE_PATH}fft3ddata.h)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../lib)
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../bin)
+
+add_library(data3d STATIC fft3ddata.cpp fft3ddata.h)
+
 
 add_executable(fft3d
                 main.cpp
