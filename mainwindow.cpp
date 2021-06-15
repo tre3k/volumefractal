@@ -12,13 +12,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     viewer->setMinimumSize(10,10);
     //this->setCentralWidget(viewer);
 
+    average = new Widgets::Average();
+
+
     QTabWidget *central_tab_widget = new QTabWidget();
     this->setCentralWidget(central_tab_widget);
 
     central_tab_widget->addTab(viewer,"Viewer");
-
+    central_tab_widget->addTab(average,"Average");
 }
 
+/* VIEWER Widget */
 
 Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
     layout = new QHBoxLayout();
@@ -84,7 +88,10 @@ void Widgets::Viewer::ShowDepth(int depth){
     plot_case_phase->plot2D->ColorMap->rescaleDataRange(true);
     plot_case_phase->plot2D->rescaleAxes();
     plot_case_phase->plot2D->replot();
-
-
 }
 
+/* AVERAGE Widget */
+
+Widgets::Average::Average(QWidget *parent) : QWidget(parent){
+
+}

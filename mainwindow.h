@@ -48,6 +48,13 @@ public slots:
 
 };
 
+class Average : public QWidget{
+    Q_OBJECT
+public:
+    Average(QWidget *parent = nullptr);
+
+};
+
 }
 
 /* MAIN WINDOW */
@@ -86,6 +93,7 @@ private:
     QString filename;
 
     Widgets::Viewer *viewer;
+    Widgets::Average *average;
 
 public:
 
