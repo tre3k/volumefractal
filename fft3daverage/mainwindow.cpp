@@ -2,13 +2,6 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-        auto dScreen = new QScreen();
-        auto dw = dScreen->geometry();
-        /* just 70% of Display */
-        this->setGeometry(int(dw.width()/2-dw.width()*0.7/2),
-                          int(dw.height()/2-dw.height()*0.7/2),
-                          int(dw.width()*0.7),int(dw.height()*0.7));
-
         this->setWindowTitle("FFT3D Average");
         this->setMinimumHeight(400);
         this->setMinimumWidth(800);
