@@ -131,6 +131,7 @@ namespace FFT3D {
 		void ReadOnlyHeader(std::string filename);
 		static void Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth);
 		static void ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth);
+		static std::complex<DATA_TYPE> ReadValueFromFile(std::string filename, unsigned int row, unsigned int column, unsigned int depth);
 		unsigned long long FileSize(void){
 			return sizeof(s_raw_file_header)+_size_x*_size_y*_size_z*sizeof(std::complex<DATA_TYPE>);
 		}

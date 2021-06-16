@@ -12,6 +12,7 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QTabWidget>
+#include <QDebug>
 
 #include "fft3ddata.h"
 #include "iqcustomplot.h"

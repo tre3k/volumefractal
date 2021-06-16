@@ -53,7 +53,6 @@ void Data::ReadOnlyHeader(std::string filename) {
 	_size_z = _size_x;
 
 	std::fclose(f);
-
 }
 
 void Data::Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth) {
@@ -84,4 +83,17 @@ void Data::ReadColumnFromFile(std::string filename, Data1D *data, unsigned int r
 	}
 
 	std::fclose(f);
+}
+
+std::complex<DATA_TYPE> Data::ReadValueFromFile(std::string filename, unsigned int row, unsigned int column, unsigned int depth){
+	std::complex<DATA_TYPE> retval {0.0,0.0};
+	
+	std::FILE *f = std::fopen(filename.c_str(),"r");
+
+	s_raw_file_header header;
+	std::fread(&header,1,sizeof(s_raw_file_header),f);
+
+	
+	std::fclose(f);
+	return retval;
 }
