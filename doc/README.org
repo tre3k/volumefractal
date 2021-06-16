@@ -1,0 +1,13 @@
+#+TITLE: Набор программ для обработки объёмных фракталов и получения их фрактальных размерностей
+#+STARTUP: overview
+#+DATE: <2021-06-16 Ср>
+#+LaTeX_HEADER: \usepackage[T2A]{fontenc}
+#+LaTeX_HEADER: \usepackage[utf8]{inputenc}
+#+LaTeX_HEADER: \usepackage[russian]{babel}
+
+
+* fft3d
+  Программа с текстовым интерфейсом, которая делает трёхмерное быстрое преобразование фурье
+
+* fft3daverage
+  Программа для обработки полученных образов фурье
