@@ -77,14 +77,17 @@ void Data::Read2DLayerSphereFromFile(std::string filename, Data2D *data, double 
 	data->Init(header.size);
 
 	double i,j,k;
-	
+	i = 0.5;
+	j = 0.5;
+	k = 0.5;
 	auto value = ReadValueFromFileInter(filename, i, j, k, header.size);
+	std::cout << "value: " << value << "\n";
 	
 }
 
 void Data::ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth){
 	std::FILE *f = std::fopen(filename.c_str(),"r");
-
+	
 	s_raw_file_header header;
 	std::fread(&header,1,sizeof(s_raw_file_header),f);
 	data->Init(header.size);
@@ -120,15 +123,40 @@ std::complex<DATA_TYPE> Data::ReadValueFromFile(std::string filename, unsigned i
 
 std::complex<DATA_TYPE> Data::ReadValueFromFileInter(std::string filename, double i, double j, double k, unsigned int size){
 	std::complex<DATA_TYPE> retval {0.0,0.0};
+	double d_row, d_column, d_depth;
 
-	double d_row,d_column,d_depth;
+	/* denormalize */	
 	d_row = i*size + 0.5*size;
 	d_column = j*size + 0.5*size;
 	d_depth = k*size + 0.5*size;
+	
+	/* Trilinear interpolation */
+	// rounding to integers 
+	double x1 = double ((int) d_row);
+	double x2 = x1+1;
+	double y1 = double ((int) d_column);
+	double y2 = y1+1;
+	double z1 = double ((int) d_depth);
+	double z2 = z1+1;
 
 	std::cout << d_row << " " << d_column << " " << d_depth << "\n";
-	
-	//retval = ReadValueFromFile(filename,512,512,512);
+	std::cout << "x1: " << x1 << " x2: " << x2 << "\n";
+	std::cout << "y1: " << y1 << " y2: " << y2 << "\n";
+	std::cout << "z1: " << z1 << " z2: " << z2 << "\n";
+
+	auto p1 = ReadValueFromFile(filename,x1,y1,z1);
+	auto p2 = ReadValueFromFile(filename,x2,y1,z1);
+	auto p3 = ReadValueFromFile(filename,x2,y1,z2);
+	auto p4 = ReadValueFromFile(filename,x2,y2,z1);
+	auto p5 = ReadValueFromFile(filename,x2,y2,z2);
+
+	std::cout << p1 << " " << p2 << " " << p3 << " " << p4 << " " << p5 << "\n";
+	retval =
+		p1*(x2-d_row)*(y2-d_column)*(z2-d_depth) +
+		p2*(d_row-x1)*(y2-d_column)*(z2-d_depth) +
+		p3*(d_row-x1)*(y2-d_column)*(d_depth-z1) +
+		p4*(d_row-x1)*(d_column-y1)*(z2-d_depth) +
+		p5*(d_row-x1)*(d_column-y1)*(d_depth-z1);	       
 	
 	return retval;
 }

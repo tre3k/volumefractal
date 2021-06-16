@@ -25,8 +25,22 @@ fi
 export CC=${CC}
 export CXX=${CXX}
 
-if [[ "$1" == "clean" ]]
-then
+function Build() {
+    # fft3d build
+    mkdir -p ${FFT3D_TMP}
+    cd ${FFT3D_TMP}
+    CC=${CC} CXX=${CXX} cmake ../
+    make -j${NP} CC=${CC} CXX=${CXX}
+
+    # fft3daverage build
+    cd ${ORIGIN_DIR}
+    mkdir -p ${AVER_TMP}
+    cd ${AVER_TMP}
+    qmake ../
+    make -j${NP} CC=${CC} CXX=${CXX}
+}
+
+function Clean(){
     cd ${ORIGIN_DIR}/${FFT3D_TMP} && make clean
     cd ${ORIGIN_DIR}/${AVER_TMP} && make clean
     cd ${ORIGIN_DIR}
@@ -34,19 +48,20 @@ then
     rm -vrf ${LIB_PATH}
     rm -vrf ${FFT3D_TMP}
     rm -vrf ${AVER_TMP}
+}
+
+
+if [[ "$1" == "clean" ]]
+then
+    Clean
     exit 0
 fi
 
-# fft3d build
-mkdir -p ${FFT3D_TMP}
-cd ${FFT3D_TMP}
-CC=${CC} CXX=${CXX} cmake ../
-make -j${NP} CC=${CC} CXX=${CXX}
+if [[ "$1" == "rebuild" ]]
+then
+    Clean
+    Build
+    exit 0
+fi
 
-
-# fft3daverage build
-cd ${ORIGIN_DIR}
-mkdir -p ${AVER_TMP}
-cd ${AVER_TMP}
-qmake ../
-make -j${NP} CC=${CC} CXX=${CXX}
+Build
