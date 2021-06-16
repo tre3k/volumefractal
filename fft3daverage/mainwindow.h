@@ -49,6 +49,30 @@ public slots:
 
 };
 
+class SphericalViewer  : public QWidget{
+        Q_OBJECT
+public:
+        SphericalViewer(QWidget *parent = nullptr);
+
+private:
+        iCasePlot2D *plot_case_ampl;
+        iCasePlot2D *plot_case_phase;
+        QSlider *slider_phi;
+        QDoubleSpinBox *spin_box_phi;
+        QSlider *slider_theta;
+        QDoubleSpinBox *spin_box_theta;
+        QString _filename;
+        FFT3D::Data2D *_data;
+
+public slots:
+        void Show(double tmp);
+        void setFileName(QString filename){_filename = filename;}
+
+signals:
+
+};
+
+
 class Average : public QWidget{
         Q_OBJECT
 public:
@@ -94,6 +118,7 @@ private:
         QString filename;
 
         Widgets::Viewer *viewer;
+        Widgets::SphericalViewer *spherical_viewer;
         Widgets::Average *average;
 
 public:
@@ -110,11 +135,10 @@ public slots:
                 unsigned long size = data.size_x();
 
                 viewer->setFileName(filename);
+                spherical_viewer->setFileName(filename);
                 viewer->SetMaxDepth(size);
                 viewer->setCurrentDepth(size/2);
         }
-
-
 
 
 signals:

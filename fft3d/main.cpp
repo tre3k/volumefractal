@@ -85,7 +85,10 @@ void benchmark(unsigned int size, unsigned int threads,std::string filename,std:
 					value = {-1,0};
 				}
 				*/
-				value = {cos(2*M_PI*i*0.123+2*M_PI*j*0.123+2*M_PI*k*0.123),0};
+				// value = {cos(2*M_PI*i*0.123+2*M_PI*j*0.123+2*M_PI*k*0.123),0};
+				value = {1.0/(i+1)*cos(2*M_PI*i*0.123+2*M_PI*j*0.0+2*M_PI*k*0.0)+
+					 1.0/(j+1)*cos(2*M_PI*i*0.0+2*M_PI*j*0.133+2*M_PI*k*0.0)+
+					 1.0/(k+1)*cos(2*M_PI*i*0.0+2*M_PI*j*0.0+2*M_PI*k*0.143),0};
 				data.setValue(i,j,k,value);			
 			}
 		}

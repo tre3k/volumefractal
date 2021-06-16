@@ -21,8 +21,66 @@ iQCustomPlot::iQCustomPlot(QWidget *parent) : QCustomPlot(parent)
                 this,SLOT(slot_full_drag_zoom(QMouseEvent*)));
         connect(this,SIGNAL(selectionChangedByUser()),
                 this,SLOT(slot_selectionChanged()));
+
+        this->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(this,SIGNAL(customContextMenuRequested(QPoint)),
+                this,SLOT(slot_contextMenuReq(QPoint)));
+
         return;
 }
+
+void iQCustomPlot::slot_contextMenuReq(QPoint p){
+    QMenu *menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    QMenu *menu_export = new QMenu("Export");
+    menu_export->setAttribute(Qt::WA_DeleteOnClose);
+    menu->addMenu(menu_export);
+
+    menu_export->addAction("bmp",this,SLOT(exportToBMP()));
+    menu_export->addAction("jpg",this,SLOT(exportToJPG()));
+    menu_export->addAction("pdf",this,SLOT(exportToPDF()));
+    menu_export->addAction("png",this,SLOT(exportToPNG()));
+
+    if(!x_log){
+        menu->addAction("x log scale",this,SLOT(setXLog()));
+    }else{
+        menu->addAction("x linear scale",this,SLOT(setXLog()));
+    }
+
+    if(!y_log){
+        menu->addAction("y log scale",this,SLOT(setYLog()));
+    }else{
+        menu->addAction("y linear scale",this,SLOT(setYLog()));
+    }
+
+    menu->popup(this->mapToGlobal(p));
+}
+
+void iQCustomPlot::setYLog(){
+    y_log = !y_log;
+    if(y_log){
+        this->yAxis->setScaleType(QCPAxis::stLogarithmic);
+        this->yAxis2->setScaleType(QCPAxis::stLogarithmic);
+    }else{
+        this->yAxis->setScaleType(QCPAxis::stLinear);
+        this->yAxis2->setScaleType(QCPAxis::stLinear);
+    }
+    this->replot();
+}
+
+void iQCustomPlot::setXLog(){
+    x_log = !x_log;
+    if(x_log){
+        this->xAxis->setScaleType(QCPAxis::stLogarithmic);
+        this->xAxis2->setScaleType(QCPAxis::stLogarithmic);
+    }else{
+        this->xAxis->setScaleType(QCPAxis::stLinear);
+        this->xAxis2->setScaleType(QCPAxis::stLinear);
+    }
+    this->replot();
+}
+
+
 
 void iQCustomPlot::addCurve(QVector<double> *x, QVector<double> *y,
                             bool point_line, QColor color, QString name){
@@ -117,17 +175,21 @@ iCasePlot2D::iCasePlot2D(QWidget *parent) : QWidget(parent)
         checkBoxManual = new QCheckBox("manual");
         checkBoxManual->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
+        rescaleButton = new QPushButton("rescale");
+
         plot2D = new iQCustomPlot2D;
         vLayout->addWidget(plot2D);
         vLayout->addLayout(hLayout);
         //hLayout->setDirection(QBoxLayout::Direction::RightToLeft);
+        hLayout->addWidget(rescaleButton);
         hLayout->addSpacing(1000);
-        hLayout->addWidget(checkBoxManual);
+        //hLayout->addWidget(checkBoxManual);
         hLayout->addWidget(checkBoxLog);
         this->setLayout(vLayout);
 
         connect(checkBoxLog,SIGNAL(clicked(bool)),this,SLOT(slot_log(bool)));
         connect(checkBoxManual,SIGNAL(clicked(bool)),this,SLOT(slot_manual(bool)));
+        connect(rescaleButton,SIGNAL(pressed()),this,SLOT(slot_rescale()));
 
         return;
 }
@@ -149,3 +211,10 @@ void iCasePlot2D::slot_manual(bool state){
         }
         plot2D->replot();
 }
+
+void iCasePlot2D::slot_rescale(){
+        this->plot2D->rescaleAxes();
+        this->plot2D->ColorMap->rescaleDataRange(true);
+        this->plot2D->replot();
+}
+

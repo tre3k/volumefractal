@@ -67,6 +67,21 @@ void Data::Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned
 	std::fclose(f);
 }
 
+void Data::Read2DLayerSphereFromFile(std::string filename, Data2D *data, double phi, double theta){
+	std::FILE *f = std::fopen(filename.c_str(),"r");
+	std::cout << "call Read2DLayerSphereFromFile\n";
+
+	s_raw_file_header header;
+	std::fread(&header,1,sizeof(s_raw_file_header),f);
+	fclose(f);
+	data->Init(header.size);
+
+	double i,j,k;
+	
+	auto value = ReadValueFromFileInter(filename, i, j, k, header.size);
+	
+}
+
 void Data::ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth){
 	std::FILE *f = std::fopen(filename.c_str(),"r");
 
@@ -92,8 +107,29 @@ std::complex<DATA_TYPE> Data::ReadValueFromFile(std::string filename, unsigned i
 
 	s_raw_file_header header;
 	std::fread(&header,1,sizeof(s_raw_file_header),f);
-
+	if(row >= header.size || column >= header.size || depth >= header.size) return retval;
+	if(row < 0 || column < 0 || depth < 0) return retval;
+	
+	unsigned int index = row + column*header.size + depth*header.size*header.size;
+	std::fseek(f,sizeof(s_raw_file_header)+index*sizeof(std::complex<DATA_TYPE>),SEEK_SET);
+	std::fread(&retval,sizeof(std::complex<DATA_TYPE>),1,f);
 	
 	std::fclose(f);
 	return retval;
 }
+
+std::complex<DATA_TYPE> Data::ReadValueFromFileInter(std::string filename, double i, double j, double k, unsigned int size){
+	std::complex<DATA_TYPE> retval {0.0,0.0};
+
+	double d_row,d_column,d_depth;
+	d_row = i*size + 0.5*size;
+	d_column = j*size + 0.5*size;
+	d_depth = k*size + 0.5*size;
+
+	std::cout << d_row << " " << d_column << " " << d_depth << "\n";
+	
+	//retval = ReadValueFromFile(filename,512,512,512);
+	
+	return retval;
+}
+

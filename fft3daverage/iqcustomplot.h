@@ -15,6 +15,15 @@ private slots:
         void slot_full_drag_zoom(QMouseEvent *);
         void slot_selectionChanged();
 
+protected:
+    bool x_log = false;
+    bool y_log = false;
+
+protected slots:
+        void slot_contextMenuReq(QPoint p);
+
+        void setXLog();
+        void setYLog();
 };
 
 class iQCustomPlot2D : public iQCustomPlot
@@ -36,12 +45,17 @@ public:
         iQCustomPlot2D *plot2D;
         QCheckBox *checkBoxLog;
         QCheckBox *checkBoxManual;
+        QPushButton *rescaleButton;
+
         QVBoxLayout *vLayout;
         QHBoxLayout *hLayout;
 
 public slots:
         void slot_log(bool);
         void slot_manual(bool);
+        void slot_rescale();
+
+
 };
 
 #endif // IQCUSTOMPLOT_H

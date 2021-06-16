@@ -10,8 +10,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
         viewer = new Widgets::Viewer();
         viewer->setMinimumSize(10,10);
-        //this->setCentralWidget(viewer);
-
+        spherical_viewer = new Widgets::SphericalViewer();
         average = new Widgets::Average();
 
 
@@ -19,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         this->setCentralWidget(central_tab_widget);
 
         central_tab_widget->addTab(viewer,"Viewer");
+        central_tab_widget->addTab(spherical_viewer,"Spherical Viewer");
         central_tab_widget->addTab(average,"Average");
 }
 
@@ -70,10 +70,6 @@ void Widgets::Viewer::ShowDepth(int depth){
                 }
         }
 
-        /*
-    plot_case->plot2D->ColorMap->data()->setRange(QCPRange(0,ui->SpinBoxSizeOfPixel->value()),
-                                                   QCPRange(0,ui->SpinBoxSizeOfPixel->value()));
-                                                   */
         plot_case_ampl->plot2D->ColorMap->rescaleDataRange(true);
         plot_case_ampl->plot2D->rescaleAxes();
         plot_case_ampl->plot2D->replot();
@@ -93,7 +89,62 @@ void Widgets::Viewer::ShowDepth(int depth){
 }
 
 /* AVERAGE Widget */
-
 Widgets::Average::Average(QWidget *parent) : QWidget(parent){
 
+}
+
+/* SphericalViewer Widget */
+Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
+        auto plotLayout = new QHBoxLayout();
+        auto phiLayout = new QHBoxLayout();
+        auto thetaLayout = new QVBoxLayout();
+        auto layout = new QVBoxLayout();
+
+        slider_phi = new QSlider(Qt::Horizontal);
+        slider_phi->setRange(-360,360);
+        spin_box_phi = new QDoubleSpinBox();
+        spin_box_phi->setRange(-360,360);
+        slider_theta = new QSlider();
+        slider_theta->setRange(-360,360);
+        spin_box_theta = new QDoubleSpinBox();
+        spin_box_theta->setRange(-360,360);
+
+        phiLayout->addWidget(new QLabel("φ, deg."));
+        phiLayout->addWidget(spin_box_phi);
+        phiLayout->addWidget(slider_phi);
+        thetaLayout->addWidget(new QLabel("θ, deg."));
+        thetaLayout->addWidget(spin_box_theta);
+        thetaLayout->addWidget(slider_theta);
+
+        plot_case_ampl = new iCasePlot2D();
+        plot_case_phase = new iCasePlot2D();
+        plot_case_phase->plot2D->ColorScale->axis()->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
+        plot_case_ampl->slot_log(true);
+        plot_case_ampl->checkBoxLog->setChecked(true);
+
+        plotLayout->addWidget(plot_case_ampl);
+        plotLayout->addWidget(plot_case_phase);
+        plotLayout->addLayout(thetaLayout);
+
+        layout->addLayout(plotLayout);
+        layout->addLayout(phiLayout);
+
+        this->setLayout(layout);
+
+        connect(spin_box_phi,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
+        connect(spin_box_theta,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
+
+        _data = new FFT3D::Data2D(0);
+}
+
+void Widgets::SphericalViewer::Show(double tmp){
+        double phi = spin_box_phi->value();
+        double theta = spin_box_theta->value();
+
+        slider_phi->setValue((int) phi);
+        slider_theta->setValue((int) theta);
+
+        if(_filename == "") return;
+        FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(), _data, phi, theta);
+        qDebug() << "ok";
 }
