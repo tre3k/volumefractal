@@ -45,7 +45,12 @@ public:
                 double dIntencity;
                 int points = 0;
 
+                QElapsedTimer timer;
+                double time_elapsed = 0;
+                double tremain;
+
                 for(double r = 0; r < 0.5; r += dr){
+                        timer.start();
                         points = 0;
                         dIntencity = 0;
                         for(double phi = 0; phi < 360.0; phi += dphi){
@@ -58,6 +63,10 @@ public:
                         intencity.append(dIntencity/points);
                         radius.append(r);
                         emit progress(1 + int(r*200.0));
+                        time_elapsed += timer.elapsed();
+                        tremain = 100.0*time_elapsed/(1+r*200.0) - time_elapsed;
+                        //emit remain((timer.elapsed()*(100-int(r*200.0)))/1000);
+                        emit remain((int)(tremain/1000));
                 }
 
                 emit finish(radius,intencity);
@@ -72,6 +81,7 @@ public slots:
 signals:
         void finish(QVector<double> ,QVector<double>);
         void progress(int);
+        void remain(int);
 
 };
 
@@ -122,6 +132,7 @@ private:
 
 public slots:
         void Show(double r);
+        void syncSpinBox(int val){spin_box_radius->setValue(val/1000.0);}
         void setFileName(QString filename){_filename = filename;}
 
 signals:
@@ -139,11 +150,13 @@ private:
         iQCustomPlot *plot_average;
         QProgressBar *progress_bar;
         QString _filename;
+        QLabel *remain_time;
 
 public slots:
         void setFileName(QString filename){_filename = filename;}
         void finish(QVector<double> r,QVector<double> intencity);
         void setProgress(int progress){progress_bar->setValue(progress);}
+        void remainTime(int val){remain_time->setText("left time: "+QString::number(val)+" s.");}
 
 };
 

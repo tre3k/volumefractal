@@ -24,6 +24,12 @@ protected slots:
 
         void setXLog();
         void setYLog();
+
+        void exportToPDF();
+        void exportToBMP();
+        void exportToJPG();
+        void exportToPNG();
+
 };
 
 class iQCustomPlot2D : public iQCustomPlot

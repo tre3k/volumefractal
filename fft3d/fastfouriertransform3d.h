@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru & fsbi NRC KI PNPI, LO, Russia
+ * Copyright (c) 2020-2021 Kirill Pshenichnyi pshcyrill@mail.ru & fsbi NRC KI PNPI, LO, Russia
  * 3D Fast Fourier Transform, License: GPLv3
  */
 

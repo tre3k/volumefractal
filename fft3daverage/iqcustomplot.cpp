@@ -56,6 +56,27 @@ void iQCustomPlot::slot_contextMenuReq(QPoint p){
     menu->popup(this->mapToGlobal(p));
 }
 
+void iQCustomPlot::exportToBMP(){
+    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".bmp","(*.bmp *.BMP)");
+    if(filename!=nullptr) this->saveBmp(filename);
+}
+
+void iQCustomPlot::exportToJPG(){
+    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".jpg","(*.jpg *.JPG)");
+    if(filename!=nullptr) this->saveJpg(filename);
+}
+
+void iQCustomPlot::exportToPDF(){
+    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".pdf","(*.pdf *.PDF)");
+    if(filename!=nullptr) this->savePdf(filename);
+}
+
+void iQCustomPlot::exportToPNG(){
+    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".png","(*.png *.PNG)");
+    if(filename!=nullptr) this->savePng(filename);
+}
+
+
 void iQCustomPlot::setYLog(){
     y_log = !y_log;
     if(y_log){

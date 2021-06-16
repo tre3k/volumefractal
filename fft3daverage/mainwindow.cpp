@@ -25,10 +25,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         connect(average->button_average,SIGNAL(pressed()),thread_average,SLOT(start()));
         connect(thread_average,SIGNAL(finish(QVector<double>,QVector<double>)),average,SLOT(finish(QVector<double>,QVector<double>)));
         connect(thread_average,SIGNAL(progress(int)),average,SLOT(setProgress(int)));
+        connect(thread_average,SIGNAL(remain(int)),average,SLOT(remainTime(int)));
 }
 
 /* VIEWER Widget */
-
 Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
         layout = new QHBoxLayout();
         layout_depth = new QVBoxLayout();
@@ -104,6 +104,7 @@ Widgets::Average::Average(QWidget *parent) : QWidget(parent){
         plot_average->yAxis->setLabel("Intencity");
         button_average = new QPushButton("average");
         progress_bar = new QProgressBar();
+        remain_time = new QLabel("time left: ");
 
         auto leftLayout = new QVBoxLayout();
         auto layout = new QHBoxLayout();
@@ -115,6 +116,7 @@ Widgets::Average::Average(QWidget *parent) : QWidget(parent){
 
         leftLayout->addWidget(button_average);
         leftLayout->addWidget(progress_bar);
+        leftLayout->addWidget(remain_time);
         leftLayout->addStretch();
 
         layout->addWidget(plot_average);
@@ -139,8 +141,8 @@ Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
         slider_radius = new QSlider();
         slider_radius->setRange(0,500);
         spin_box_radius = new QDoubleSpinBox();
-        spin_box_radius->setRange(0,0.499); // * 1000
-        spin_box_radius->setDecimals(3);
+        spin_box_radius->setRange(0,0.5); // * 1000
+        spin_box_radius->setDecimals(5);
         spin_box_radius->setSingleStep(0.01);
 
         radiusLayout->addWidget(new QLabel("r, a.u."));
@@ -166,9 +168,11 @@ Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
         this->setLayout(layout);
 
         connect(spin_box_radius,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
+        connect(slider_radius,SIGNAL(valueChanged(int)),this,SLOT(syncSpinBox(int)));
 
         _data = new FFT3D::Data2D(0);
 }
+
 
 void Widgets::SphericalViewer::Show(double r){
         slider_radius->setValue(r*1000);
