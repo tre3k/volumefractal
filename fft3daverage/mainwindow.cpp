@@ -2,6 +2,13 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+        auto dScreen = new QScreen();
+        auto dw = dScreen->geometry();
+        /* just 70% of Display */
+        this->setGeometry(int(dw.width()/2-dw.width()*0.7/2),
+                          int(dw.height()/2-dw.height()*0.7/2),
+                          int(dw.width()*0.7),int(dw.height()*0.7));
+
         this->setWindowTitle("FFT3D Average");
         this->setMinimumHeight(400);
         this->setMinimumWidth(800);
@@ -20,6 +27,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         central_tab_widget->addTab(viewer,"Viewer");
         central_tab_widget->addTab(spherical_viewer,"Spherical Viewer");
         central_tab_widget->addTab(average,"Average");
+
+        thread_average = new ThreadAverage();
+        connect(average->button_average,SIGNAL(pressed()),thread_average,SLOT(start()));
+        connect(thread_average,SIGNAL(finish(QVector<double>,QVector<double>)),average,SLOT(finish(QVector<double>,QVector<double>)));
+        connect(thread_average,SIGNAL(progress(int)),average,SLOT(setProgress(int)));
 }
 
 /* VIEWER Widget */
@@ -29,6 +41,10 @@ Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
         layout_depth = new QVBoxLayout();
         plot_case_ampl = new iCasePlot2D();
         plot_case_phase = new iCasePlot2D();
+        plot_case_ampl->plot2D->xAxis->setLabel("x, pix.");
+        plot_case_ampl->plot2D->yAxis->setLabel("y, pix.");
+        plot_case_phase->plot2D->xAxis->setLabel("x, pix.");
+        plot_case_phase->plot2D->yAxis->setLabel("y, pix.");
         plot_case_phase->plot2D->ColorScale->axis()->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
         plot_case_ampl->slot_log(true);
         plot_case_ampl->checkBoxLog->setChecked(true);
@@ -90,61 +106,110 @@ void Widgets::Viewer::ShowDepth(int depth){
 
 /* AVERAGE Widget */
 Widgets::Average::Average(QWidget *parent) : QWidget(parent){
+        plot_average = new iQCustomPlot();
+        plot_average->xAxis->setLabel("r, arb. units");
+        plot_average->yAxis->setLabel("Intencity");
+        button_average = new QPushButton("average");
+        progress_bar = new QProgressBar();
+
+        auto leftLayout = new QVBoxLayout();
+        auto layout = new QHBoxLayout();
+
+        plot_average->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+        progress_bar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+        progress_bar->setMaximumHeight(10);
+        progress_bar->setTextVisible(false);
+
+        leftLayout->addWidget(button_average);
+        leftLayout->addWidget(progress_bar);
+        leftLayout->addStretch();
+
+        layout->addWidget(plot_average);
+        layout->addLayout(leftLayout);
+
+        this->setLayout(layout);
 
 }
+
+void Widgets::Average::finish(QVector<double> r,QVector<double> intencity){
+        plot_average->clearGraphs();
+        plot_average->addCurve(&r,&intencity,true,QColor("black"),"test");
+}
+
 
 /* SphericalViewer Widget */
 Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
         auto plotLayout = new QHBoxLayout();
-        auto phiLayout = new QHBoxLayout();
-        auto thetaLayout = new QVBoxLayout();
+        auto radiusLayout = new QVBoxLayout();
         auto layout = new QVBoxLayout();
 
-        slider_phi = new QSlider(Qt::Horizontal);
-        slider_phi->setRange(-360,360);
-        spin_box_phi = new QDoubleSpinBox();
-        spin_box_phi->setRange(-360,360);
-        slider_theta = new QSlider();
-        slider_theta->setRange(-360,360);
-        spin_box_theta = new QDoubleSpinBox();
-        spin_box_theta->setRange(-360,360);
+        slider_radius = new QSlider();
+        slider_radius->setRange(0,500);
+        spin_box_radius = new QDoubleSpinBox();
+        spin_box_radius->setRange(0,0.499); // * 1000
+        spin_box_radius->setDecimals(3);
+        spin_box_radius->setSingleStep(0.01);
 
-        phiLayout->addWidget(new QLabel("φ, deg."));
-        phiLayout->addWidget(spin_box_phi);
-        phiLayout->addWidget(slider_phi);
-        thetaLayout->addWidget(new QLabel("θ, deg."));
-        thetaLayout->addWidget(spin_box_theta);
-        thetaLayout->addWidget(slider_theta);
+        radiusLayout->addWidget(new QLabel("r, a.u."));
+        radiusLayout->addWidget(spin_box_radius);
+        radiusLayout->addWidget(slider_radius);
 
         plot_case_ampl = new iCasePlot2D();
         plot_case_phase = new iCasePlot2D();
+        plot_case_ampl->plot2D->xAxis->setLabel("φ, deg.");
+        plot_case_ampl->plot2D->yAxis->setLabel("θ, deg.");
+        plot_case_phase->plot2D->xAxis->setLabel("φ, deg.");
+        plot_case_phase->plot2D->yAxis->setLabel("θ, deg.");
         plot_case_phase->plot2D->ColorScale->axis()->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
         plot_case_ampl->slot_log(true);
         plot_case_ampl->checkBoxLog->setChecked(true);
 
         plotLayout->addWidget(plot_case_ampl);
         plotLayout->addWidget(plot_case_phase);
-        plotLayout->addLayout(thetaLayout);
+        plotLayout->addLayout(radiusLayout);
 
         layout->addLayout(plotLayout);
-        layout->addLayout(phiLayout);
 
         this->setLayout(layout);
 
-        connect(spin_box_phi,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
-        connect(spin_box_theta,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
+        connect(spin_box_radius,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
 
         _data = new FFT3D::Data2D(0);
 }
 
-void Widgets::SphericalViewer::Show(double tmp){
-        double phi = spin_box_phi->value();
-        double theta = spin_box_theta->value();
-
-        slider_phi->setValue((int) phi);
-        slider_theta->setValue((int) theta);
+void Widgets::SphericalViewer::Show(double r){
+        slider_radius->setValue(r*1000);
 
         if(_filename == "") return;
-        FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(), _data, phi, theta);
-        qDebug() << "ok";
+        //FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(), _data, phi, theta);
+        //std::cout << FFT3D::Data::ReadValueSphere(_filename.toStdString(),0.1,phi,theta) << "\n";
+
+        FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(), _data, r);
+
+        unsigned long size = _data->size();
+        plot_case_ampl->plot2D->ColorMap->data()->setSize(size,size);
+        plot_case_ampl->plot2D->ColorMap->data()->setRange(QCPRange(-180,180),QCPRange(-180,180));
+
+        for(int i=0;i<size;i++){
+                for(int j=0;j<size;j++){
+                        plot_case_ampl->plot2D->ColorMap->data()->setCell(i,j,abs(_data->getValue(i,j)));
+                }
+        }
+
+        plot_case_ampl->plot2D->ColorMap->rescaleDataRange(true);
+        plot_case_ampl->plot2D->rescaleAxes();
+        plot_case_ampl->plot2D->replot();
+
+        plot_case_phase->plot2D->ColorMap->data()->setSize(size,size);
+        plot_case_phase->plot2D->ColorMap->data()->setRange(QCPRange(-180,180),QCPRange(-180,180));
+
+        for(int i=0;i<size;i++){
+                for(int j=0;j<size;j++){
+                        plot_case_phase->plot2D->ColorMap->data()->setCell(i,j,arg(_data->getValue(i,j)));
+                }
+        }
+
+        plot_case_phase->plot2D->ColorMap->rescaleDataRange(true);
+        plot_case_phase->plot2D->rescaleAxes();
+        plot_case_phase->plot2D->replot();
 }

@@ -10,6 +10,7 @@
 #include <complex>
 #include <string>
 #include <iostream>
+#include <math.h>
 
 namespace FFT3D {
 #define DATA_TYPE double
@@ -130,11 +131,12 @@ namespace FFT3D {
 		void ReadFromRawFile(std::string filename);
 		void ReadOnlyHeader(std::string filename);
 		static void Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth);
-		static void Read2DLayerSphereFromFile(std::string filename, Data2D *data, double phi, double theta);
+		static void Read2DLayerSphereFromFile(std::string filename, Data2D *data, double r);
 		static void ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth);
 		
 		static std::complex<DATA_TYPE> ReadValueFromFile(std::string filename, unsigned int row, unsigned int column, unsigned int depth);
 		static std::complex<DATA_TYPE> ReadValueFromFileInter(std::string filename, double i, double j, double k, unsigned int size);  // i,j and k range from -0.5 to 0.5
+		static std::complex<DATA_TYPE> ReadValueSphere(std::string filename, double r, double phi, double theta); // -0.5 < r < 0.5, angles in degree
       
 		unsigned long long FileSize(void){
 			return sizeof(s_raw_file_header)+_size_x*_size_y*_size_z*sizeof(std::complex<DATA_TYPE>);
