@@ -1,6 +1,22 @@
 /*
- * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru & fsbi NRC KI PNPI, LO, Russia
- * 3D Fast Fourier Transform, License: GPLv3
+ *  Copyright (c) 2020-2021 NRC KI PNPI, Gatchina, LO, 188300 Russia
+ *
+ *  This file is part of volumefractal (fft3d).
+ *
+ *  volumefractal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *     Author: Kirill Pshenichnyi <pshcyrill@mail.ru>
  */
 
 
@@ -29,12 +45,14 @@ void output_cube(FFT3D::Data *data, bool magnitude = false){
 	}
 }
 
+// This function out the size in human format
+// long int -> string
 std::string human_size(unsigned long size){
 	std::string retval;
 	std::string postfix;
 	int count = 0;
 
-	double h = (double)size;
+	double h = (double) size;
 
 	while(h>=1024){
 		h /= 1024;
@@ -62,15 +80,23 @@ std::string human_size(unsigned long size){
 		break;
 	}
 
-	retval = std::to_string(h).substr(0, std::to_string(h).find(".") + 3 + 1) + postfix;
+	retval = std::to_string(h).
+		substr(0, std::to_string(h).find(".") + 3 + 1) + postfix;
 
 	return retval;
 }
 
-void benchmark(unsigned int size, unsigned int threads,std::string filename,std::string in_filename){
+void benchmark(unsigned int size,
+	       unsigned int threads,
+	       std::string filename,
+	       std::string in_filename
+	) {
 	std::cout << std::endl << "Benchmark..." << std::endl;
 	FFT3D::Data data(size);
-	std::chrono::time_point<std::chrono::high_resolution_clock> start_time,midle_time,end_time;
+	std::chrono::time_point <std::chrono::high_resolution_clock>
+		start_time,
+		midle_time,
+		end_time;
 
 	std::complex<DATA_TYPE> value;
 
@@ -78,35 +104,54 @@ void benchmark(unsigned int size, unsigned int threads,std::string filename,std:
 	for(int k=0;k<data.size_z();k++){
 		for(int j=0;j<data.size_y();j++){
 			for(int i=0;i<data.size_x();i++){
-    				// if((cos(2*M_PI*0.025*i)+cos(2*M_PI*0.025*j)+cos(2*M_PI*0.025*k))>=0){
+    				// if((cos(2*M_PI*0.025*i) +
+				//     cos(2*M_PI*0.025*j) +
+				//     cos(2*M_PI*0.025*k))>=0){
 				// 	value = {1,0};
 				// }else{
 				// 	value = {-1,0};
 				// }
-				
-				// value = {cos(2*M_PI*i*0.123+2*M_PI*j*0.123+2*M_PI*k*0.123),0};
-				value = {cos(2*M_PI*i*0.1 + 2*M_PI*j*0.0 + 2*M_PI*k*0.0)
-					+cos(2*M_PI*i*0.0 + 2*M_PI*j*0.2 + 2*M_PI*k*0.0)
-					+cos(2*M_PI*i*0.0 + 2*M_PI*j*0.0 + 2*M_PI*k*0.3),0};
-				
-				data.setValue(i,j,k,value);			
+
+				// value = {cos(2*M_PI*i*0.123 +
+				// 	     2*M_PI*j*0.123 +
+				// 	     2*M_PI*k*0.123), 0};
+
+				value = {cos(2*M_PI*i*0.1 +
+					     2*M_PI*j*0.0 +
+					     2*M_PI*k*0.0) +
+					cos(2*M_PI*i*0.0 +
+					    2*M_PI*j*0.2 +
+					    2*M_PI*k*0.0) +
+					cos(2*M_PI*i*0.0 +
+					    2*M_PI*j*0.0 +
+					    2*M_PI*k*0.3), 0};
+
+				data.setValue(i,j,k,value);
 			}
 		}
 	}
 	end_time = std::chrono::high_resolution_clock::now();
-	std::cout << "Initial array: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
+	std::cout << "Initial array: " <<
+		(double)(end_time-start_time).count()/1000000.0 <<
+		" ms" << std::endl << std::endl;
 
-	if(in_filename!=""){
-		std::cout << "Write to file " << in_filename << "..." << std::endl;
+	if(in_filename != ""){
+		std::cout << "Write to file " << in_filename << "..." <<
+			std::endl;
 		start_time = std::chrono::high_resolution_clock::now();
 		data.WriteToRawFile(in_filename);
 		end_time = std::chrono::high_resolution_clock::now();
-		double speed = data.FileSize()/(double)(end_time-start_time).count()/1e-9;
-		std::cout << "Write file time: " << (double)(end_time-start_time).count()/1000000.0 << " ms ("<< human_size(speed) << "/s)" << std::endl << std::endl;
+		double speed =
+			data.FileSize() /
+			(double)(end_time-start_time).count() / 1e-9;
+		std::cout << "Write file time: " <<
+			(double)(end_time-start_time).count() / 1000000.0 <<
+			" ms ("<< human_size(speed) << "/s)" <<
+			std::endl << std::endl;
 	}
 
 	start_time = std::chrono::high_resolution_clock::now();
-	FFT3D::FastFourierTransform3D *fft = new FFT3D::FastFourierTransform3D(&data);
+	auto fft = new FFT3D::FastFourierTransform3D(&data);
 	fft->setNumberOfThreads(threads);
 	fft->GenerateFFTConsts();
 	fft->GeneratePermutation(FFT3D::Permutations::P_CENTER_ZERO);
@@ -115,34 +160,53 @@ void benchmark(unsigned int size, unsigned int threads,std::string filename,std:
 	fft->calculate();
 	end_time = std::chrono::high_resolution_clock::now();
 
-	std::cout << std::endl << "Initial Time: " << (double)(midle_time-start_time).count()/1000000.0 << " ms" << std::endl;
-	std::cout << "Calculation Time: " << (double)(end_time-start_time).count()/1000000.0 << " ms" << std::endl << std::endl;
+	std::cout << std::endl << "Initial Time: " <<
+		(double)(midle_time-start_time).count()/1000000.0 <<
+		" ms" << std::endl;
+	std::cout << "Calculation Time: " <<
+		(double)(end_time-start_time).count() / 1000000.0 <<
+		" ms" << std::endl << std::endl;
 
-	if(filename!=""){
-		std::cout << "Write to file " << filename << "..." << std::endl;
+	if(filename != ""){
+		std::cout << "Write to file " <<
+			filename << "..." << std::endl;
 		start_time = std::chrono::high_resolution_clock::now();
 		data.WriteToRawFile(filename);
 		end_time = std::chrono::high_resolution_clock::now();
-		double speed = data.FileSize()/(double)(end_time-start_time).count()/1e-9;
-		std::cout << "Write file time: " << (double)(end_time-start_time).count()/1000000.0 << " ms ("<< human_size(speed) << "/s)" << std::endl << std::endl;
+		double speed = data.FileSize() /
+			(double)(end_time-start_time).count()/1e-9;
+		std::cout << "Write file time: " <<
+			(double)(end_time-start_time).count()/1000000.0 <<
+			" ms ("<< human_size(speed) << "/s)" <<
+			std::endl << std::endl;
 	}
 
 	delete fft;
 }
 
-void help(std::string prg){
+// This function just output Help message if fft3d run without arguments
+void help(std::string prg) {
 	std::cout << prg << " [options]" << std::endl;
 	std::cout << "options: " << std::endl;
-	std::cout << "\t-in <filename>\r\t\t\t\tinput *.raw filename" << std::endl;
-	std::cout << "\t-out <filename>\r\t\t\t\toutput *.raw filename" << std::endl;
-	std::cout << "\t-j <num>\r\t\t\t\tnumber of threads" << std::endl;
-	std::cout << "\t-q\r\t\t\t\tdo not ask for confirmation" << std::endl;
-	std::cout << "\t-b <size>\r\t\t\t\tbenchmark for size x size x size" << std::endl;
+	std::cout << "\t-in <filename>\r\t\t\t\tinput *.raw filename" <<
+		std::endl;
+	std::cout << "\t-out <filename>\r\t\t\t\toutput *.raw filename" <<
+		std::endl;
+	std::cout << "\t-j <num>\r\t\t\t\tnumber of threads" <<
+		std::endl;
+	std::cout << "\t-q\r\t\t\t\tdo not ask for confirmation" <<
+		std::endl;
+	std::cout << "\t-b <size>\r\t\t\t\tbenchmark for size x size x size" <<
+		std::endl;
 
 }
 
-int main(int argc,char *argv[]){
-	std::cout << "GPLv3 (c) 2020-2021 Kirill Pshenichnyi & fsbi NRC KI PNPI, LO, Russia" << std::endl;
+int main(int argc,char *argv[]) {
+	std::cout << "GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
+		     "Gatchina, LO, 188300 Russia" <<
+		std::endl;
+	std::cout << "Author: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
+		std::endl;
 	unsigned long size{0};
 	unsigned long opt_benchmark{0};
 	unsigned int opt_threads{1};
@@ -155,21 +219,22 @@ int main(int argc,char *argv[]){
 	FFT3D::Data data(0);
 
 	CmdLine::Options opt(argc,argv);
-	opt.parse("-j",CmdLine::T_INT,&opt_threads);
-	opt.parse("-b",CmdLine::T_INT,&opt_benchmark);
-	opt.parse("-q",CmdLine::T_BOOL,&opt_d_accept);
-	opt.parse("-h",CmdLine::T_BOOL,&opt_help);
-	opt.parse("-out",CmdLine::T_STRING,&opt_out_filename);
-	opt.parse("-in",CmdLine::T_STRING,&opt_in_filename);
+	opt.parse("-j", CmdLine::T_INT, &opt_threads);
+	opt.parse("-b", CmdLine::T_INT, &opt_benchmark);
+	opt.parse("-q", CmdLine::T_BOOL, &opt_d_accept);
+	opt.parse("-h", CmdLine::T_BOOL, &opt_help);
+	opt.parse("-out", CmdLine::T_STRING, &opt_out_filename);
+	opt.parse("-in", CmdLine::T_STRING, &opt_in_filename);
 
 	if(argc < 2 || opt_help){
 		help(argv[0]); return 0;
 	}
 
-	if(opt_benchmark!=0) size = opt_benchmark;
+	if(opt_benchmark != 0) size = opt_benchmark;
 
-	if(opt_out_filename==""){
-		std::cout << "no output file specified! (see -out option)" << std::endl;
+	if(opt_out_filename == ""){
+		std::cout << "no output file specified! (see -out option)" <<
+			std::endl;
 		if(!opt_d_accept){
 			status = "";
 			std::cout << "do you want to continue? ";
@@ -181,24 +246,39 @@ int main(int argc,char *argv[]){
 		}
 	}
 
-	if(opt_in_filename=="" && opt_benchmark==0){
-		std::cout << "no input file specified (see -in option)" << std::endl;
+	if(opt_in_filename == "" && opt_benchmark == 0){
+		std::cout << "no input file specified (see -in option)"
+			  << std::endl;
 		std::cout << "nothing to do. Exiting." << std::endl;
 		return 0;
 	}
 
-	if(opt_benchmark==0){
+	if(opt_benchmark == 0){
 		data.ReadOnlyHeader(opt_in_filename);
 		size = data.size_x();
 	}
-	std::cout << "Size: " << size << "x" << size << "x" << size << std::endl;
+	std::cout << "Size: " << size << "x" << size << "x" << size <<
+		std::endl;
 	std::cout << "\033[1mThreads: " << opt_threads << "\033[0m\n";
-	std::cout << "On current system DATA_TYPE size: " << sizeof(DATA_TYPE) << " bytes or " << sizeof(DATA_TYPE)*8 << " bits" << std::endl;
-	unsigned long long ram_size = sizeof(std::complex<DATA_TYPE>)*(size*size*size+size*opt_threads);
-	std::cout << "you need RAM size: " << ram_size << " bytes (" << human_size(ram_size) << ")" << std::endl;
-	if(opt_out_filename!=""){
-		unsigned long long disk_space = sizeof(FFT3D::Data::s_raw_file_header)+size*size*size*sizeof(std::complex<DATA_TYPE>);
-		std::cout << "you need disk space size: " << disk_space << " bytes (" << human_size(disk_space) << ") for " << opt_out_filename << std::endl;
+	std::cout << "On current system DATA_TYPE size: " <<
+		sizeof(DATA_TYPE) <<
+		" bytes or " <<
+		sizeof(DATA_TYPE) * 8 << " bits" << std::endl;
+
+	unsigned long long ram_size =
+		sizeof(std::complex<DATA_TYPE>) *
+		(size*size*size + size*opt_threads);
+	std::cout << "you need RAM size: " <<
+		ram_size << " bytes (" << human_size(ram_size) << ")" <<
+		std::endl;
+
+	if(opt_out_filename != ""){
+		unsigned long long disk_space =
+			sizeof(FFT3D::Data::s_raw_file_header) +
+			size*size*size*sizeof(std::complex<DATA_TYPE>);
+		std::cout << "you need disk space size: " <<
+			disk_space << " bytes (" << human_size(disk_space) <<
+			") for " << opt_out_filename << std::endl;
 	}
 	if(!opt_d_accept){
 		status = "";
@@ -215,7 +295,7 @@ int main(int argc,char *argv[]){
 	}
 
 	data.ReadFromRawFile(opt_in_filename);
-	FFT3D::FastFourierTransform3D *fft = new FFT3D::FastFourierTransform3D(&data);
+	auto fft = new FFT3D::FastFourierTransform3D(&data);
 	fft->setNumberOfThreads(opt_threads);
 	fft->GenerateFFTConsts();
 	fft->GeneratePermutation(FFT3D::Permutations::P_CENTER_ZERO);
@@ -227,4 +307,3 @@ int main(int argc,char *argv[]){
 
 	return 0;
 }
-

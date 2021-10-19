@@ -1,7 +1,24 @@
 /*
- * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru & fsbi NRC KI PNPI, LO, Russia
- * 3D Fast Fourier Transform, License: GPLv3
+ *  Copyright (c) 2020-2021 NRC KI PNPI, Gatchina, LO, 188300 Russia
+ *
+ *  This file is part of volumefractal (fft3d).
+ *
+ *  volumefractal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *     Author: Kirill Pshenichnyi <pshcyrill@mail.ru>
  */
+
 
 #include "fft3ddata.h"
 
@@ -80,20 +97,20 @@ void Data::Read2DLayerSphereFromFile(std::string filename, Data2D *data, double 
 	std::complex<DATA_TYPE> value;
 
 	int i = 0, j = 0;
-	
+
 	for(double phi = -180; phi < 180; phi += dphi){
 		for(double theta = -180; theta < 180; theta += dphi){
 			value = ReadValueSphere(filename,r,phi,theta);
 			data->setValue(i,j,value);
 			j++;
 		}
-		i++; j=0;	
+		i++; j=0;
 	}
 }
 
 void Data::ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth){
 	std::FILE *f = std::fopen(filename.c_str(),"r");
-	
+
 	s_raw_file_header header;
 	std::fread(&header,1,sizeof(s_raw_file_header),f);
 	data->Init(header.size);
@@ -111,18 +128,18 @@ void Data::ReadColumnFromFile(std::string filename, Data1D *data, unsigned int r
 
 std::complex<DATA_TYPE> Data::ReadValueFromFile(std::string filename, unsigned int row, unsigned int column, unsigned int depth){
 	std::complex<DATA_TYPE> retval {0.0,0.0};
-	
+
 	std::FILE *f = std::fopen(filename.c_str(),"r");
 
 	s_raw_file_header header;
 	std::fread(&header,1,sizeof(s_raw_file_header),f);
 	if(row > header.size || column > header.size || depth > header.size) return retval;
 	if(row < 0 || column < 0 || depth < 0) return retval;
-	
+
 	unsigned int index = row + column*header.size + depth*header.size*header.size;
 	std::fseek(f,sizeof(s_raw_file_header)+index*sizeof(std::complex<DATA_TYPE>),SEEK_SET);
 	std::fread(&retval,sizeof(std::complex<DATA_TYPE>),1,f);
-	
+
 	std::fclose(f);
 	return retval;
 }
@@ -131,13 +148,13 @@ std::complex<DATA_TYPE> Data::ReadValueFromFileInter(std::string filename, doubl
 	std::complex<DATA_TYPE> retval {0.0,0.0};
 	double d_row, d_column, d_depth;
 
-	/* denormalize */	
+	/* denormalize */
 	d_row = i*size + 0.5*size;
 	d_column = j*size + 0.5*size;
 	d_depth = k*size + 0.5*size;
-	
+
 	/* Trilinear interpolation */
-	// rounding to integers 
+	// rounding to integers
 	double x1 = double ((int) d_row);
 	double x2 = x1+1;
 	double y1 = double ((int) d_column);
@@ -161,8 +178,8 @@ std::complex<DATA_TYPE> Data::ReadValueFromFileInter(std::string filename, doubl
 		p2*(d_row-x1)*(y2-d_column)*(z2-d_depth) +
 		p3*(d_row-x1)*(y2-d_column)*(d_depth-z1) +
 		p4*(d_row-x1)*(d_column-y1)*(z2-d_depth) +
-		p5*(d_row-x1)*(d_column-y1)*(d_depth-z1);	       
-	
+		p5*(d_row-x1)*(d_column-y1)*(d_depth-z1);
+
 	return retval;
 }
 
@@ -180,8 +197,6 @@ std::complex<DATA_TYPE> Data::ReadValueSphere(std::string filename, double r, do
 	k = r*cos(M_PI*theta/180.0);
 
 	// std::cout << i << " " << j << " " << k << " " << "\n";
-	
+
 	return Data::ReadValueFromFileInter(filename,i,j,k,header.size);
 }
-
-

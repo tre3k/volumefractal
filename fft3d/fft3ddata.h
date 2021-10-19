@@ -1,6 +1,22 @@
 /*
- * Copyright (c) 2020 Kirill Pshenichnyi pshcyrill@mail.ru & fsbi NRC KI PNPI, LO, Russia
- * 3D Fast Fourier Transform, License: GPLv3
+ *  Copyright (c) 2020-2021 NRC KI PNPI, Gatchina, LO, 188300 Russia
+ *
+ *  This file is part of volumefractal (fft3d).
+ *
+ *  volumefractal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *     Author: Kirill Pshenichnyi <pshcyrill@mail.ru>
  */
 
 
@@ -13,6 +29,7 @@
 #include <math.h>
 
 namespace FFT3D {
+
 #define DATA_TYPE double
 
 	class Data1D{
@@ -30,9 +47,9 @@ namespace FFT3D {
 		unsigned long size(void){return _size;}
 		std::complex<DATA_TYPE>& operator[](unsigned long val){return _data[val];}
 		void setData(unsigned long index,std::complex<DATA_TYPE> val){_data[index] = val;}
-      
+
 	};
-  
+
 	class Data2D{
 	private:
 		unsigned long _size {0};
@@ -133,11 +150,11 @@ namespace FFT3D {
 		static void Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth);
 		static void Read2DLayerSphereFromFile(std::string filename, Data2D *data, double r);
 		static void ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth);
-		
+
 		static std::complex<DATA_TYPE> ReadValueFromFile(std::string filename, unsigned int row, unsigned int column, unsigned int depth);
 		static std::complex<DATA_TYPE> ReadValueFromFileInter(std::string filename, double i, double j, double k, unsigned int size);  // i,j and k range from -0.5 to 0.5
 		static std::complex<DATA_TYPE> ReadValueSphere(std::string filename, double r, double phi, double theta); // -0.5 < r < 0.5, angles in degree
-      
+
 		unsigned long long FileSize(void){
 			return sizeof(s_raw_file_header)+_size_x*_size_y*_size_z*sizeof(std::complex<DATA_TYPE>);
 		}
@@ -146,4 +163,3 @@ namespace FFT3D {
 
 }
 #endif
-
