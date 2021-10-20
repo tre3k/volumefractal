@@ -190,7 +190,7 @@ Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
         plot_case_phase->plot2D->xAxis->setLabel("φ, deg.");
         plot_case_phase->plot2D->yAxis->setLabel("θ, deg.");
         plot_case_phase->plot2D->ColorScale->axis()->setTicker(
-			QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
+		QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
         plot_case_ampl->slot_log(true);
         plot_case_ampl->checkBoxLog->setChecked(true);
 

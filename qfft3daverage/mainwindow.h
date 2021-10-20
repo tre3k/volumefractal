@@ -91,8 +91,10 @@ public:
                         radius.append(r);
                         emit progress(1 + int(r*200.0));
                         time_elapsed += timer.elapsed();
-                        tremain = 100.0*time_elapsed/(1+r*200.0) - time_elapsed;
-                        //emit remain((timer.elapsed()*(100-int(r*200.0)))/1000);
+                        tremain = 100.0*time_elapsed/(1+r*200.0) -
+				time_elapsed;
+                        // emit remain((timer.elapsed() *
+			// 	     (100-int(r*200.0)))/1000);
                         emit remain((int)(tremain/1000));
                 }
 
@@ -114,78 +116,85 @@ signals:
 
 namespace Widgets{
 
-class Viewer : public QWidget{
-        Q_OBJECT
-private:
-        QHBoxLayout *layout;
-        QVBoxLayout *layout_depth;
-        iCasePlot2D *plot_case_ampl;
-        iCasePlot2D *plot_case_phase;
-        QString _filename;
-        FFT3D::Data2D *_data;
-        QSlider *slider;
-        QSpinBox *spin_box_depth;
+	class Viewer : public QWidget{
+		Q_OBJECT
+	private:
+		QHBoxLayout *layout;
+		QVBoxLayout *layout_depth;
+		iCasePlot2D *plot_case_ampl;
+		iCasePlot2D *plot_case_phase;
+		QString _filename;
+		FFT3D::Data2D *_data;
+		QSlider *slider;
+		QSpinBox *spin_box_depth;
 
-public:
-        Viewer(QWidget *parent = nullptr);
+	public:
+		Viewer(QWidget *parent = nullptr);
 
-public slots:
-        void ShowDepth(int depth);
-        void setFileName(QString filename){_filename = filename;}
+	public slots:
+		void ShowDepth(int depth);
+		void setFileName(QString filename){_filename = filename;}
 
-        void SetMaxDepth(unsigned long max_depth){
-                slider->setRange(0,max_depth-1);
-                spin_box_depth->setRange(0,max_depth-1);
-        }
-        void setCurrentDepth(int depth){
-                slider->setValue(depth);
-        }
-
-
-};
-
-class SphericalViewer  : public QWidget{
-        Q_OBJECT
-public:
-        SphericalViewer(QWidget *parent = nullptr);
-
-private:
-        iCasePlot2D *plot_case_ampl;
-        iCasePlot2D *plot_case_phase;
-        QSlider *slider_radius;
-        QDoubleSpinBox *spin_box_radius;
-        QString _filename;
-        FFT3D::Data2D *_data;
-
-public slots:
-        void Show(double r);
-        void syncSpinBox(int val){spin_box_radius->setValue(val/1000.0);}
-        void setFileName(QString filename){_filename = filename;}
-
-signals:
-
-};
+		void SetMaxDepth(unsigned long max_depth){
+			slider->setRange(0,max_depth-1);
+			spin_box_depth->setRange(0,max_depth-1);
+		}
+		void setCurrentDepth(int depth){
+			slider->setValue(depth);
+		}
 
 
-class Average : public QWidget{
-        Q_OBJECT
-public:
-        Average(QWidget *parent = nullptr);
-        QPushButton *button_average;
+	};
 
-private:
-        iQCustomPlot *plot_average;
-        QProgressBar *progress_bar;
-        QString _filename;
-        QLabel *remain_time;
+	class SphericalViewer  : public QWidget{
+		Q_OBJECT
+	public:
+		SphericalViewer(QWidget *parent = nullptr);
 
-public slots:
-        void setFileName(QString filename){_filename = filename;}
-        void finish(QVector<double> r,QVector<double> intencity);
-        void setProgress(int progress){progress_bar->setValue(progress);}
-        void remainTime(int val){remain_time->setText("left time: "+QString::number(val)+" s.");}
+	private:
+		iCasePlot2D *plot_case_ampl;
+		iCasePlot2D *plot_case_phase;
+		QSlider *slider_radius;
+		QDoubleSpinBox *spin_box_radius;
+		QString _filename;
+		FFT3D::Data2D *_data;
 
-};
+	public slots:
+		void Show(double r);
+		void syncSpinBox(int val){
+			spin_box_radius->setValue(val/1000.0);
+		}
+		void setFileName(QString filename){_filename = filename;}
+
+	signals:
+
+	};
+
+
+	class Average : public QWidget {
+		Q_OBJECT
+	public:
+		Average(QWidget *parent = nullptr);
+		QPushButton *button_average;
+
+	private:
+		iQCustomPlot *plot_average;
+		QProgressBar *progress_bar;
+		QString _filename;
+		QLabel *remain_time;
+
+	public slots:
+		void setFileName(QString filename){_filename = filename;}
+		void finish(QVector<double> r,QVector<double> intencity);
+		void setProgress(int progress){
+			progress_bar->setValue(progress);
+		}
+		void remainTime(int val){
+			remain_time->setText("left time: " +
+					     QString::number(val)+" s.");
+		}
+
+	};
 
 }
 
@@ -217,8 +226,10 @@ private:
                 menu_bar.file_menu->addAction(menu_bar.exit);
 
                 this->setMenuBar(menu_bar.menu_bar);
-                connect(menu_bar.open,SIGNAL(triggered()),this,SLOT(OpenFile()));
-                connect(menu_bar.exit,SIGNAL(triggered()),this,SLOT(close()));
+                connect(menu_bar.open, SIGNAL(triggered()),
+			this, SLOT(OpenFile()));
+                connect(menu_bar.exit, SIGNAL(triggered()),
+			this, SLOT(close()));
         }
 
         /* filename */
@@ -236,7 +247,10 @@ public:
 
 public slots:
         void OpenFile(void){
-                filename = QFileDialog::getOpenFileName(nullptr,"Open FFT3D file","","*.raw");
+                filename = QFileDialog::getOpenFileName(nullptr,
+							"Open FFT3D file",
+							"",
+							"*.raw");
                 if(filename=="") return;
 
                 FFT3D::Data data(0);
@@ -251,10 +265,7 @@ public slots:
                 viewer->setCurrentDepth(size/2);
         }
 
-
 signals:
-
-
 
 };
 

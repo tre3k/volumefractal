@@ -1,3 +1,25 @@
+/*
+ *  Copyright (c) 2020-2021 NRC KI PNPI, Gatchina, LO, 188300 Russia
+ *
+ *  This file is part of volumefractal (fft3daverage).
+ *
+ *  volumefractal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *     Author: Kirill Pshenichnyi <pshcyrill@mail.ru>
+ */
+
+
 #include "iqcustomplot.h"
 
 iQCustomPlot::iQCustomPlot(QWidget *parent) : QCustomPlot(parent)
@@ -12,11 +34,17 @@ iQCustomPlot::iQCustomPlot(QWidget *parent) : QCustomPlot(parent)
         this->xAxis2->setVisible(true);
         this->yAxis2->setVisible(true);
 
-        connect(this->xAxis, SIGNAL(rangeChanged(QCPRange)),this->xAxis2, SLOT(setRange(QCPRange)));
-        connect(this->yAxis, SIGNAL(rangeChanged(QCPRange)), this->yAxis2, SLOT(setRange(QCPRange)));
+        connect(this->xAxis, SIGNAL(rangeChanged(QCPRange)),
+		this->xAxis2, SLOT(setRange(QCPRange)));
+        connect(this->yAxis, SIGNAL(rangeChanged(QCPRange)),
+		this->yAxis2, SLOT(setRange(QCPRange)));
 
-        connect(this,SIGNAL(axisClick(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)),
-                this,SLOT(slot_sAxies_drag_zoom(QCPAxis*,QCPAxis::SelectablePart,QMouseEvent*)));
+        connect(this,SIGNAL(axisClick(QCPAxis*,
+				      QCPAxis::SelectablePart,
+				      QMouseEvent*)),
+                this,SLOT(slot_sAxies_drag_zoom(QCPAxis*,
+						QCPAxis::SelectablePart,
+						QMouseEvent*)));
         connect(this,SIGNAL(mouseDoubleClick(QMouseEvent*)),
                 this,SLOT(slot_full_drag_zoom(QMouseEvent*)));
         connect(this,SIGNAL(selectionChangedByUser()),
@@ -30,75 +58,87 @@ iQCustomPlot::iQCustomPlot(QWidget *parent) : QCustomPlot(parent)
 }
 
 void iQCustomPlot::slot_contextMenuReq(QPoint p){
-    QMenu *menu = new QMenu(this);
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-    QMenu *menu_export = new QMenu("Export");
-    menu_export->setAttribute(Qt::WA_DeleteOnClose);
-    menu->addMenu(menu_export);
+	QMenu *menu = new QMenu(this);
+	menu->setAttribute(Qt::WA_DeleteOnClose);
+	QMenu *menu_export = new QMenu("Export");
+	menu_export->setAttribute(Qt::WA_DeleteOnClose);
+	menu->addMenu(menu_export);
 
-    menu_export->addAction("bmp",this,SLOT(exportToBMP()));
-    menu_export->addAction("jpg",this,SLOT(exportToJPG()));
-    menu_export->addAction("pdf",this,SLOT(exportToPDF()));
-    menu_export->addAction("png",this,SLOT(exportToPNG()));
+	menu_export->addAction("bmp",this,SLOT(exportToBMP()));
+	menu_export->addAction("jpg",this,SLOT(exportToJPG()));
+	menu_export->addAction("pdf",this,SLOT(exportToPDF()));
+	menu_export->addAction("png",this,SLOT(exportToPNG()));
 
-    if(!x_log){
-        menu->addAction("x log scale",this,SLOT(setXLog()));
-    }else{
-        menu->addAction("x linear scale",this,SLOT(setXLog()));
-    }
+	if(!x_log){
+		menu->addAction("x log scale",this,SLOT(setXLog()));
+	}else{
+		menu->addAction("x linear scale",this,SLOT(setXLog()));
+	}
 
-    if(!y_log){
-        menu->addAction("y log scale",this,SLOT(setYLog()));
-    }else{
-        menu->addAction("y linear scale",this,SLOT(setYLog()));
-    }
+	if(!y_log){
+		menu->addAction("y log scale",this,SLOT(setYLog()));
+	}else{
+		menu->addAction("y linear scale",this,SLOT(setYLog()));
+	}
 
-    menu->popup(this->mapToGlobal(p));
+	menu->popup(this->mapToGlobal(p));
 }
 
 void iQCustomPlot::exportToBMP(){
-    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".bmp","(*.bmp *.BMP)");
-    if(filename!=nullptr) this->saveBmp(filename);
+	auto filename = QFileDialog::getSaveFileName(nullptr,
+						     "Save",
+						     ".bmp",
+						     "(*.bmp *.BMP)");
+	if(filename!=nullptr) this->saveBmp(filename);
 }
 
 void iQCustomPlot::exportToJPG(){
-    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".jpg","(*.jpg *.JPG)");
-    if(filename!=nullptr) this->saveJpg(filename);
+	auto filename = QFileDialog::getSaveFileName(nullptr,
+						     "Save",
+						     ".jpg",
+						     "(*.jpg *.JPG)");
+	if(filename!=nullptr) this->saveJpg(filename);
 }
 
 void iQCustomPlot::exportToPDF(){
-    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".pdf","(*.pdf *.PDF)");
-    if(filename!=nullptr) this->savePdf(filename);
+	auto filename = QFileDialog::getSaveFileName(nullptr,
+						     "Save",
+						     ".pdf",
+						     "(*.pdf *.PDF)");
+	if(filename!=nullptr) this->savePdf(filename);
 }
 
 void iQCustomPlot::exportToPNG(){
-    auto filename = QFileDialog::getSaveFileName(nullptr,"Save",".png","(*.png *.PNG)");
-    if(filename!=nullptr) this->savePng(filename);
+	auto filename = QFileDialog::getSaveFileName(nullptr,
+						     "Save",
+						     ".png",
+						     "(*.png *.PNG)");
+	if(filename!=nullptr) this->savePng(filename);
 }
 
 
 void iQCustomPlot::setYLog(){
-    y_log = !y_log;
-    if(y_log){
-        this->yAxis->setScaleType(QCPAxis::stLogarithmic);
-        this->yAxis2->setScaleType(QCPAxis::stLogarithmic);
-    }else{
-        this->yAxis->setScaleType(QCPAxis::stLinear);
-        this->yAxis2->setScaleType(QCPAxis::stLinear);
-    }
-    this->replot();
+	y_log = !y_log;
+	if(y_log){
+		this->yAxis->setScaleType(QCPAxis::stLogarithmic);
+		this->yAxis2->setScaleType(QCPAxis::stLogarithmic);
+	}else{
+		this->yAxis->setScaleType(QCPAxis::stLinear);
+		this->yAxis2->setScaleType(QCPAxis::stLinear);
+	}
+	this->replot();
 }
 
 void iQCustomPlot::setXLog(){
-    x_log = !x_log;
-    if(x_log){
-        this->xAxis->setScaleType(QCPAxis::stLogarithmic);
-        this->xAxis2->setScaleType(QCPAxis::stLogarithmic);
-    }else{
-        this->xAxis->setScaleType(QCPAxis::stLinear);
-        this->xAxis2->setScaleType(QCPAxis::stLinear);
-    }
-    this->replot();
+	x_log = !x_log;
+	if(x_log){
+		this->xAxis->setScaleType(QCPAxis::stLogarithmic);
+		this->xAxis2->setScaleType(QCPAxis::stLogarithmic);
+	}else{
+		this->xAxis->setScaleType(QCPAxis::stLinear);
+		this->xAxis2->setScaleType(QCPAxis::stLinear);
+	}
+	this->replot();
 }
 
 
@@ -109,18 +149,41 @@ void iQCustomPlot::addCurve(QVector<double> *x, QVector<double> *y,
         this->addGraph();
 
         if(point_line){
-                this->graph(num)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle,"gray",color,5));
-                //this->graph(num)->setSelectedPen(QPen(QColor(color),2,Qt::DotLine,Qt::SquareCap,Qt::BevelJoin));
-                this->graph(num)->setPen(QPen(QColor(color),1,Qt::NoPen,Qt::SquareCap,Qt::BevelJoin));
+                this->graph(num)->setScatterStyle(
+			QCPScatterStyle(QCPScatterStyle::ssCircle,
+					"gray",
+					color, 5));
+                // this->graph(num)->setSelectedPen(QPen(QColor(color),
+		// 				      2,
+		// 				      Qt::DotLine,
+		// 				      Qt::SquareCap,
+		// 				      Qt::BevelJoin));
+                this->graph(num)->setPen(QPen(QColor(color),
+					      1,
+					      Qt::NoPen,
+					      Qt::SquareCap,
+					      Qt::BevelJoin));
         }else{
-                //this->graph(num)->setSelectedPen(QPen(QColor(color),2,Qt::SolidLine,Qt::SquareCap,Qt::BevelJoin));
-                this->graph(num)->setPen(QPen(QColor(color),1,Qt::SolidLine,Qt::SquareCap,Qt::BevelJoin));
+                // this->graph(num)->setSelectedPen(QPen(QColor(color),
+		// 				      2,
+		// 				      Qt::SolidLine,
+		// 				      Qt::SquareCap,
+		// 				      Qt::BevelJoin));
+                this->graph(num)->setPen(QPen(QColor(color),
+					      1,
+					      Qt::SolidLine,
+					      Qt::SquareCap,
+					      Qt::BevelJoin));
         }
 
         this->graph(num)->setData(*x,*y);
         this->graph(num)->setName(name);
 
-        this->graph(num)->selectionDecorator()->setPen(QPen(QColor(color),2,Qt::DotLine,Qt::SquareCap,Qt::BevelJoin));
+        this->graph(num)->selectionDecorator()->setPen(QPen(QColor(color),
+							    2,
+							    Qt::DotLine,
+							    Qt::SquareCap,
+							    Qt::BevelJoin));
 
         this->rescaleAxes(true);
         this->replot();
@@ -128,7 +191,9 @@ void iQCustomPlot::addCurve(QVector<double> *x, QVector<double> *y,
 }
 
 
-void iQCustomPlot::slot_sAxies_drag_zoom(QCPAxis* sAxis,QCPAxis::SelectablePart part,QMouseEvent* event){
+void iQCustomPlot::slot_sAxies_drag_zoom(QCPAxis* sAxis,
+					 QCPAxis::SelectablePart part,
+					 QMouseEvent* event) {
         this->axisRect()->setRangeDrag(sAxis->orientation());
         this->axisRect()->setRangeZoom(sAxis->orientation());
         return;
@@ -143,36 +208,49 @@ void iQCustomPlot::slot_full_drag_zoom(QMouseEvent *mouseEvent){
 }
 
 void iQCustomPlot::slot_selectionChanged(){
-        if (this->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || this->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
-                        this->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) || this->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
-        {
-                this->xAxis2->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
-                this->xAxis->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
-        }
-        // make left and right axes be selected synchronously, and handle axis and tick labels as one selectable object:
-        if (this->yAxis->selectedParts().testFlag(QCPAxis::spAxis) || this->yAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
-                        this->yAxis2->selectedParts().testFlag(QCPAxis::spAxis) || this->yAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
-        {
-                this->yAxis2->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
-                this->yAxis->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+        if (this->xAxis->selectedParts().testFlag(QCPAxis::spAxis) ||
+	    this->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
+            this->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) ||
+	    this->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+	{
+                this->xAxis2->setSelectedParts(QCPAxis::spAxis |
+					       QCPAxis::spTickLabels);
+                this->xAxis->setSelectedParts(QCPAxis::spAxis |
+					      QCPAxis::spTickLabels);
         }
 
-        // synchronize selection of graphs with selection of corresponding legend items:
+        // make left and right axes be selected synchronously,
+	// and handle axis and tick labels as one selectable object:
+        if (this->yAxis->selectedParts().testFlag(QCPAxis::spAxis) ||
+	    this->yAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
+	    this->yAxis2->selectedParts().testFlag(QCPAxis::spAxis) ||
+	    this->yAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+        {
+                this->yAxis2->setSelectedParts(QCPAxis::spAxis|
+					       QCPAxis::spTickLabels);
+                this->yAxis->setSelectedParts(QCPAxis::spAxis|
+					      QCPAxis::spTickLabels);
+        }
+
+        // synchronize selection of graphs with selection of corresponding
+	// legend items:
         for (int i=0; i<this->graphCount(); ++i)
         {
                 QCPGraph *graph = this->graph(i);
-                QCPPlottableLegendItem *item = this->legend->itemWithPlottable(graph);
+                QCPPlottableLegendItem *item = this->legend->
+			itemWithPlottable(graph);
                 if (item->selected() || graph->selected())
                 {
                         item->setSelected(true);
-                        graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
+                        graph->setSelection(QCPDataSelection(
+						    graph->data()->dataRange()
+						    ));
                 }
         }
         return;
 }
 
 /* iQCustomPlot2D */
-
 iQCustomPlot2D::iQCustomPlot2D(QWidget *parent) : iQCustomPlot(parent)
 {
         ColorMap = new QCPColorMap(this->xAxis,this->yAxis);
@@ -208,9 +286,12 @@ iCasePlot2D::iCasePlot2D(QWidget *parent) : QWidget(parent)
         hLayout->addWidget(checkBoxLog);
         this->setLayout(vLayout);
 
-        connect(checkBoxLog,SIGNAL(clicked(bool)),this,SLOT(slot_log(bool)));
-        connect(checkBoxManual,SIGNAL(clicked(bool)),this,SLOT(slot_manual(bool)));
-        connect(rescaleButton,SIGNAL(pressed()),this,SLOT(slot_rescale()));
+        connect(checkBoxLog, SIGNAL(clicked(bool)),
+		this, SLOT(slot_log(bool)));
+        connect(checkBoxManual, SIGNAL(clicked(bool)),
+		this, SLOT(slot_manual(bool)));
+        connect(rescaleButton, SIGNAL(pressed()),
+		this, SLOT(slot_rescale()));
 
         return;
 }
@@ -238,4 +319,3 @@ void iCasePlot2D::slot_rescale(){
         this->plot2D->ColorMap->rescaleDataRange(true);
         this->plot2D->replot();
 }
-
