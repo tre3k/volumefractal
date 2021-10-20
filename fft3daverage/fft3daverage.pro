@@ -1,5 +1,7 @@
-QT += core gui printsupport \
-    widgets
+QT += core \
+      gui \
+      printsupport \
+      widgets
 
 TARGET = fft3daverage
 TEMPLATE = app

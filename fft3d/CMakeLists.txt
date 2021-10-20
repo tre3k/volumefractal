@@ -18,8 +18,9 @@ add_library(data3d STATIC fft3ddata.cpp fft3ddata.h)
 
 
 add_executable(fft3d
-                main.cpp
-                fastfouriertransform3d.cpp ${INCLUDE_PATH}fastfouriertransform3d.h
-                options.cpp ${INCLUDE_PATH}options.h)
+               main.cpp
+               fastfouriertransform3d.cpp
+	       ${INCLUDE_PATH}fastfouriertransform3d.h
+               options.cpp ${INCLUDE_PATH}options.h)
 
 target_link_libraries(fft3d data3d)

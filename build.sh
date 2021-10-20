@@ -29,7 +29,8 @@ function Build() {
     # fft3d build
     mkdir -p ${FFT3D_TMP}
     cd ${FFT3D_TMP}
-    CC=${CC} CXX=${CXX} cmake ../
+    CC=${CC} CXX=${CXX} cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
+    mv compile_commands.json ../
     make -j${NP} CC=${CC} CXX=${CXX}
 
     # fft3daverage build
@@ -37,7 +38,8 @@ function Build() {
     mkdir -p ${AVER_TMP}
     cd ${AVER_TMP}
     qmake ../
-    make -j${NP} CC=${CC} CXX=${CXX}
+    bear -- make -j${NP} CC=${CC} CXX=${CXX}
+    mv compile_commands.json ../
 }
 
 function Clean(){
