@@ -21,9 +21,9 @@
 
 
 #include "mainwindow.h"
+#include "qwidget.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         this->setWindowTitle("FFT3D Average");
         this->setMinimumHeight(400);
         this->setMinimumWidth(800);
@@ -39,19 +39,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
         QTabWidget *central_tab_widget = new QTabWidget();
         this->setCentralWidget(central_tab_widget);
 
-        central_tab_widget->addTab(viewer,"Viewer");
-        central_tab_widget->addTab(spherical_viewer,"Spherical Viewer");
-        central_tab_widget->addTab(average,"Average");
+        central_tab_widget->addTab(viewer, "Viewer");
+        central_tab_widget->addTab(spherical_viewer, "Spherical Viewer");
+        central_tab_widget->addTab(average, "Average");
 
         thread_average = new ThreadAverage();
-        connect(average->button_average,SIGNAL(pressed()),thread_average,SLOT(start()));
-        connect(thread_average,SIGNAL(finish(QVector<double>,QVector<double>)),average,SLOT(finish(QVector<double>,QVector<double>)));
-        connect(thread_average,SIGNAL(progress(int)),average,SLOT(setProgress(int)));
-        connect(thread_average,SIGNAL(remain(int)),average,SLOT(remainTime(int)));
+        connect(average->button_average, SIGNAL(pressed()),
+		thread_average, SLOT(start()));
+        connect(thread_average,
+		SIGNAL(finish(QVector<double>, QVector<double>)),
+		average,
+		SLOT(finish(QVector<double>, QVector<double>)));
+        connect(thread_average, SIGNAL(progress(int)),
+		average, SLOT(setProgress(int)));
+        connect(thread_average, SIGNAL(remain(int)),
+		average, SLOT(remainTime(int)));
 }
 
 /* VIEWER Widget */
-Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
+Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent) {
         layout = new QHBoxLayout();
         layout_depth = new QVBoxLayout();
         plot_case_ampl = new iCasePlot2D();
@@ -60,7 +66,9 @@ Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
         plot_case_ampl->plot2D->yAxis->setLabel("y, pix.");
         plot_case_phase->plot2D->xAxis->setLabel("x, pix.");
         plot_case_phase->plot2D->yAxis->setLabel("y, pix.");
-        plot_case_phase->plot2D->ColorScale->axis()->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
+        plot_case_phase->plot2D->ColorScale->axis()->setTicker(
+		QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi)
+		);
         plot_case_ampl->slot_log(true);
         plot_case_ampl->checkBoxLog->setChecked(true);
 
@@ -77,27 +85,33 @@ Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent){
         layout->addLayout(layout_depth);
         this->setLayout(layout);
 
-        connect(spin_box_depth,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
-        connect(spin_box_depth,SIGNAL(valueChanged(int)),this,SLOT(ShowDepth(int)));
-        connect(slider,SIGNAL(valueChanged(int)),spin_box_depth,SLOT(setValue(int)));
+        connect(spin_box_depth, SIGNAL(valueChanged(int)),
+		slider, SLOT(setValue(int)));
+        connect(spin_box_depth, SIGNAL(valueChanged(int)),
+		this, SLOT(ShowDepth(int)));
+        connect(slider, SIGNAL(valueChanged(int)),
+		spin_box_depth, SLOT(setValue(int)));
 
         _data = new FFT3D::Data2D(0);
 }
 
+void Widgets::Viewer::ShowDepth(int depth) {
+        if(_filename == "") return;
 
-void Widgets::Viewer::ShowDepth(int depth){
-        if(_filename=="") return;
-
-        FFT3D::Data::Read2DLayerDepthFromFile(_filename.toStdString(),_data,(unsigned long) depth);
+        FFT3D::Data::Read2DLayerDepthFromFile(_filename.toStdString(),
+					      _data, (unsigned long) depth);
 
         unsigned long size = _data->size();
-        plot_case_ampl->plot2D->ColorMap->data()->setSize(size,size);
-        plot_case_ampl->plot2D->ColorMap->data()->setRange(QCPRange(0,size),QCPRange(0,size));
+        plot_case_ampl->plot2D->ColorMap->data()->setSize(size, size);
+        plot_case_ampl->plot2D->ColorMap->data()->setRange(QCPRange(0, size),
+							   QCPRange(0, size));
 
-        for(int i=0;i<size;i++){
-                for(int j=0;j<size;j++){
-                        plot_case_ampl->plot2D->ColorMap->data()->setCell(i,j,abs(_data->getValue(i,j)));
-                        //plot_case_ampl->plot2D->ColorMap->data()->setCell(i,j,_data->getValue(i,j).real());
+        for(unsigned long i=0; i < size; i++){
+                for(unsigned long j = 0; j < size; j++){
+                        plot_case_ampl->plot2D->ColorMap->data()->
+				setCell(i,j,abs(_data->getValue(i,j)));
+                        // plot_case_ampl->plot2D->ColorMap->data()->
+			// 	setCell(i,j,_data->getValue(i,j).real());
                 }
         }
 
@@ -106,11 +120,13 @@ void Widgets::Viewer::ShowDepth(int depth){
         plot_case_ampl->plot2D->replot();
 
         plot_case_phase->plot2D->ColorMap->data()->setSize(size,size);
-        plot_case_phase->plot2D->ColorMap->data()->setRange(QCPRange(0,size),QCPRange(0,size));
+        plot_case_phase->plot2D->ColorMap->data()->setRange(QCPRange(0, size),
+							    QCPRange(0, size));
 
-        for(int i=0;i<size;i++){
-                for(int j=0;j<size;j++){
-                        plot_case_phase->plot2D->ColorMap->data()->setCell(i,j,arg(_data->getValue(i,j)));
+        for(unsigned long i=0; i<size; i++){
+                for(unsigned long j=0; j<size; j++){
+                        plot_case_phase->plot2D->ColorMap->data()->
+				setCell(i, j, arg(_data->getValue(i, j)));
                 }
         }
 
@@ -131,8 +147,10 @@ Widgets::Average::Average(QWidget *parent) : QWidget(parent){
         auto leftLayout = new QVBoxLayout();
         auto layout = new QHBoxLayout();
 
-        plot_average->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-        progress_bar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+        plot_average->setSizePolicy(QSizePolicy::Expanding,
+				    QSizePolicy::Expanding);
+        progress_bar->setSizePolicy(QSizePolicy::Minimum,
+				    QSizePolicy::Minimum);
         progress_bar->setMaximumHeight(10);
         progress_bar->setTextVisible(false);
 
@@ -147,12 +165,6 @@ Widgets::Average::Average(QWidget *parent) : QWidget(parent){
         this->setLayout(layout);
 
 }
-
-void Widgets::Average::finish(QVector<double> r,QVector<double> intencity){
-        plot_average->clearGraphs();
-        plot_average->addCurve(&r,&intencity,true,QColor("black"),"test");
-}
-
 
 /* SphericalViewer Widget */
 Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
@@ -177,7 +189,8 @@ Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
         plot_case_ampl->plot2D->yAxis->setLabel("θ, deg.");
         plot_case_phase->plot2D->xAxis->setLabel("φ, deg.");
         plot_case_phase->plot2D->yAxis->setLabel("θ, deg.");
-        plot_case_phase->plot2D->ColorScale->axis()->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
+        plot_case_phase->plot2D->ColorScale->axis()->setTicker(
+			QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
         plot_case_ampl->slot_log(true);
         plot_case_ampl->checkBoxLog->setChecked(true);
 
@@ -189,29 +202,41 @@ Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
 
         this->setLayout(layout);
 
-        connect(spin_box_radius,SIGNAL(valueChanged(double)),this,SLOT(Show(double)));
-        connect(slider_radius,SIGNAL(valueChanged(int)),this,SLOT(syncSpinBox(int)));
+        connect(spin_box_radius, SIGNAL(valueChanged(double)),
+		this, SLOT(Show(double)));
+        connect(slider_radius, SIGNAL(valueChanged(int)),
+		this, SLOT(syncSpinBox(int)));
 
         _data = new FFT3D::Data2D(0);
 }
 
+void Widgets::Average::finish(QVector<double> r,QVector<double> intencity) {
+        plot_average->clearGraphs();
+        plot_average->addCurve(&r, &intencity, true, QColor("black"), "test");
+}
 
-void Widgets::SphericalViewer::Show(double r){
+void Widgets::SphericalViewer::Show(double r) {
         slider_radius->setValue(r*1000);
 
         if(_filename == "") return;
-        //FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(), _data, phi, theta);
-        //std::cout << FFT3D::Data::ReadValueSphere(_filename.toStdString(),0.1,phi,theta) << "\n";
 
-        FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(), _data, r);
+        // FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(),
+	// 				       _data, phi, theta);
+        // std::cout << FFT3D::Data::ReadValueSphere(_filename.toStdString(),
+	// 					  0.1, phi, theta) << "\n";
+
+        FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(),
+					       _data, r);
 
         unsigned long size = _data->size();
-        plot_case_ampl->plot2D->ColorMap->data()->setSize(size,size);
-        plot_case_ampl->plot2D->ColorMap->data()->setRange(QCPRange(-180,180),QCPRange(-180,180));
+        plot_case_ampl->plot2D->ColorMap->data()->setSize(size, size);
+        plot_case_ampl->plot2D->ColorMap->data()->
+		setRange(QCPRange(-180, 180), QCPRange(-180, 180));
 
-        for(int i=0;i<size;i++){
-                for(int j=0;j<size;j++){
-                        plot_case_ampl->plot2D->ColorMap->data()->setCell(i,j,abs(_data->getValue(i,j)));
+        for(unsigned long i=0; i<size; i++){
+                for(unsigned long j=0; j<size; j++){
+                        plot_case_ampl->plot2D->ColorMap->data()->
+				setCell(i, j, abs(_data->getValue(i, j)));
                 }
         }
 
@@ -220,11 +245,13 @@ void Widgets::SphericalViewer::Show(double r){
         plot_case_ampl->plot2D->replot();
 
         plot_case_phase->plot2D->ColorMap->data()->setSize(size,size);
-        plot_case_phase->plot2D->ColorMap->data()->setRange(QCPRange(-180,180),QCPRange(-180,180));
+        plot_case_phase->plot2D->ColorMap->data()->
+		setRange(QCPRange(-180, 180), QCPRange(-180, 180));
 
-        for(int i=0;i<size;i++){
-                for(int j=0;j<size;j++){
-                        plot_case_phase->plot2D->ColorMap->data()->setCell(i,j,arg(_data->getValue(i,j)));
+        for(unsigned long i=0; i<size; i++){
+                for(unsigned j=0; j<size; j++){
+                        plot_case_phase->plot2D->ColorMap->data()->
+				setCell(i, j, arg(_data->getValue(i, j)));
                 }
         }
 

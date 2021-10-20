@@ -5,10 +5,10 @@ NP=8   # threads for compile
 ORIGIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 FFT3D_PATH=fft3d
-AVER_PATH=fft3daverage
+QAVER_PATH=qfft3daverage
 
 FFT3D_TMP=${FFT3D_PATH}/build
-AVER_TMP=${AVER_PATH}/build
+QAVER_TMP=${QAVER_PATH}/build
 
 BIN_PATH=bin
 LIB_PATH=lib
@@ -33,10 +33,10 @@ function Build() {
     mv compile_commands.json ../
     make -j${NP} CC=${CC} CXX=${CXX}
 
-    # fft3daverage build
+    # qfft3daverage build
     cd ${ORIGIN_DIR}
-    mkdir -p ${AVER_TMP}
-    cd ${AVER_TMP}
+    mkdir -p ${QAVER_TMP}
+    cd ${QAVER_TMP}
     qmake ../
     bear -- make -j${NP} CC=${CC} CXX=${CXX}
     mv compile_commands.json ../
@@ -44,12 +44,12 @@ function Build() {
 
 function Clean(){
     cd ${ORIGIN_DIR}/${FFT3D_TMP} && make clean
-    cd ${ORIGIN_DIR}/${AVER_TMP} && make clean
+    cd ${ORIGIN_DIR}/${QAVER_TMP} && make clean
     cd ${ORIGIN_DIR}
     rm -vrf ${BIN_PATH}
     rm -vrf ${LIB_PATH}
     rm -vrf ${FFT3D_TMP}
-    rm -vrf ${AVER_TMP}
+    rm -vrf ${QAVER_TMP}
 }
 
 
