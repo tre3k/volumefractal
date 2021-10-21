@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 		size << "x" << size << std::endl;
 	std::cout << "output file: " <<
 		output_file_name <<
-		" (" << data.FileSize() << " bytes )" <<
+		" (" << FFT3D::Data::human_size(data.FileSize()) << ")" <<
 		std::endl;
 
 

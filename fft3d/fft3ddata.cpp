@@ -229,3 +229,45 @@ std::complex<DATA_TYPE> Data::ReadValueSphere(std::string filename,
 
 	return Data::ReadValueFromFileInter(filename,i,j,k,header.size);
 }
+
+
+// This function out the size in human format
+// long int -> string
+std::string Data::human_size(unsigned long size){
+	std::string retval;
+	std::string postfix;
+	int count = 0;
+
+	double h = (double) size;
+
+	while(h>=1024){
+		h /= 1024;
+		count ++;
+	}
+
+	switch (count) {
+        case 0:
+		postfix = " bytes";
+		break;
+        case 1:
+		postfix = " KB";
+		break;
+        case 2:
+		postfix = " MB";
+		break;
+        case 3:
+		postfix = " GB";
+		break;
+        case 4:
+		postfix = " TB";
+		break;
+        case 5:
+		postfix = " PB";
+		break;
+	}
+
+	retval = std::to_string(h).
+		substr(0, std::to_string(h).find(".") + 3 + 1) + postfix;
+
+	return retval;
+}

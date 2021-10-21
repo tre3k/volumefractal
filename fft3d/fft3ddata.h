@@ -190,6 +190,8 @@ namespace FFT3D {
 					       unsigned int row,
 					       unsigned int depth);
 
+		static std::string human_size(unsigned long size);
+
 		static std::complex<DATA_TYPE>
 		ReadValueFromFile(std::string filename,
 				  unsigned int row,

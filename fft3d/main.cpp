@@ -45,47 +45,6 @@ void output_cube(FFT3D::Data *data, bool magnitude = false){
 	}
 }
 
-// This function out the size in human format
-// long int -> string
-std::string human_size(unsigned long size){
-	std::string retval;
-	std::string postfix;
-	int count = 0;
-
-	double h = (double) size;
-
-	while(h>=1024){
-		h /= 1024;
-		count ++;
-	}
-
-	switch (count) {
-        case 0:
-		postfix = " bytes";
-		break;
-        case 1:
-		postfix = " KB";
-		break;
-        case 2:
-		postfix = " MB";
-		break;
-        case 3:
-		postfix = " GB";
-		break;
-        case 4:
-		postfix = " TB";
-		break;
-        case 5:
-		postfix = " PB";
-		break;
-	}
-
-	retval = std::to_string(h).
-		substr(0, std::to_string(h).find(".") + 3 + 1) + postfix;
-
-	return retval;
-}
-
 void benchmark(unsigned int size,
 	       unsigned int threads,
 	       std::string filename,
@@ -146,7 +105,7 @@ void benchmark(unsigned int size,
 			(double)(end_time-start_time).count() / 1e-9;
 		std::cout << "Write file time: " <<
 			(double)(end_time-start_time).count() / 1000000.0 <<
-			" ms ("<< human_size(speed) << "/s)" <<
+			" ms ("<< FFT3D::Data::human_size(speed) << "/s)" <<
 			std::endl << std::endl;
 	}
 
@@ -177,7 +136,7 @@ void benchmark(unsigned int size,
 			(double)(end_time-start_time).count()/1e-9;
 		std::cout << "Write file time: " <<
 			(double)(end_time-start_time).count()/1000000.0 <<
-			" ms ("<< human_size(speed) << "/s)" <<
+			" ms ("<< FFT3D::Data::human_size(speed) << "/s)" <<
 			std::endl << std::endl;
 	}
 
@@ -203,7 +162,7 @@ void help(std::string prg) {
 
 int main(int argc,char *argv[]) {
 	std::cout << "GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
-		     "Gatchina, LO, 188300 Russia" <<
+		"Gatchina, LO, 188300 Russia" <<
 		std::endl;
 	std::cout << "Author: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
 		std::endl;
@@ -269,7 +228,8 @@ int main(int argc,char *argv[]) {
 		sizeof(std::complex<DATA_TYPE>) *
 		(size*size*size + size*opt_threads);
 	std::cout << "you need RAM size: " <<
-		ram_size << " bytes (" << human_size(ram_size) << ")" <<
+		ram_size << " bytes (" <<
+		FFT3D::Data::human_size(ram_size) << ")" <<
 		std::endl;
 
 	if(opt_out_filename != ""){
@@ -277,7 +237,8 @@ int main(int argc,char *argv[]) {
 			sizeof(FFT3D::Data::s_raw_file_header) +
 			size*size*size*sizeof(std::complex<DATA_TYPE>);
 		std::cout << "you need disk space size: " <<
-			disk_space << " bytes (" << human_size(disk_space) <<
+			disk_space << " bytes (" <<
+			FFT3D::Data::human_size(disk_space) <<
 			") for " << opt_out_filename << std::endl;
 	}
 	if(!opt_d_accept){
