@@ -25,6 +25,7 @@
 #include <fft3ddata.h>
 #include <string>
 
+#include "primitives.h"
 
 void help(char *progname) {
 	std::cout << "Usage: " << progname << " [options]" << std::endl;
@@ -104,7 +105,9 @@ int main(int argc, char *argv[]) {
 		std::endl;
 
 
-	std::cout << "output file: " <<
+	Primitives::Cube cube(&data);
+
+	std::cout << "write to output file: " <<
 		output_file_name <<
 		" (" << FFT3D::Data::human_size(data.FileSize()) << ")" <<
 		std::endl;

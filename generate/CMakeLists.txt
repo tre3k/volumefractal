@@ -19,6 +19,7 @@ link_directories(${LIB_PATH})
 add_executable(
   generate
   main.cpp
+  primitives.cpp primitives.h
   )
 
 

@@ -29,10 +29,16 @@
 #include <math.h>
 
 namespace FFT3D {
-
 #define DATA_TYPE double
+	typedef struct s_acoord {
+		unsigned long i, j, k;
+	} acoord;
 
-	class Data1D{
+	typedef struct s_rcoord {
+		double i, j, k;
+	} rcoord;
+
+	class Data1D {
 	private:
 		unsigned long _size{0};
 		std::complex<DATA_TYPE> *_data {nullptr};
@@ -54,7 +60,7 @@ namespace FFT3D {
 
 	};
 
-	class Data2D{
+	class Data2D {
 	private:
 		unsigned long _size {0};
 		std::complex<DATA_TYPE> *_data {nullptr};
@@ -85,7 +91,7 @@ namespace FFT3D {
 
 	};
 
-	class Data{
+	class Data {
 	private:
 		std::complex<DATA_TYPE> *_data {nullptr};
 
