@@ -30,12 +30,19 @@
 void help(char *progname) {
 	std::cout << "Usage: " << progname << " [options]" << std::endl;
 	std::cout << "Options: " << std::endl;
+
 	std::cout << "\t-h, --help\r\t\t\t\t\tThis message" <<
 		std::endl;
-	std::cout << "\t-s, --size=<size>\r\t\t\t\t\tSize of data" <<
+	std::cout << "\t-s, --size=<size>\r\t\t\t\t\t"
+		"Size of data" <<
 		std::endl;
-	std::cout << "\t-o, --output=<filename>\r\t\t\t\t\tOutput filename" <<
+	std::cout << "\t-o, --output=<filename>\r\t\t\t\t\t"
+		"Output filename" <<
 		std::endl;
+	std::cout << "\t-i, --itteration=<num>\r\t\t\t\t\t"
+		"Step itteration count" <<
+		std::endl;
+
 	std::cout << std::endl;
 }
 
@@ -52,12 +59,14 @@ int main(int argc, char *argv[]) {
 	/* default options */
 	int size = 64;
 	std::string output_file_name = "out.raw";
+	int itteration = 3;
 
 	int opt;
 	static struct option long_options[] = {
 		{"help", no_argument, 0, 'h'},
 		{"size", required_argument, 0, 's'},
 		{"output", required_argument, 0, 'o'},
+		{"itteration", required_argument, 0, 'i'},
 		{0, 0 ,0 ,0}
 	};
 
@@ -69,7 +78,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while(1) {
-		opt = getopt_long(argc, argv, "hs:o:",
+		opt = getopt_long(argc, argv, "hs:o:i:",
 				  long_options, &option_index);
 
 		if(opt < 0) break;
@@ -89,6 +98,10 @@ int main(int argc, char *argv[]) {
 
 		case 'o':
 			output_file_name = std::string(optarg);
+			break;
+
+		case 'i':
+			itteration = std::atoi(optarg);
 			break;
 
 		case '?':
