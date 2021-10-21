@@ -17,9 +17,9 @@ set(LIB_PATH ${CMAKE_SOURCE_DIR}/../lib)
 link_directories(${LIB_PATH})
 
 add_executable(
-  generator
+  generate
   main.cpp
   )
 
 
-target_link_libraries(generator data3d)
+target_link_libraries(generate data3d)

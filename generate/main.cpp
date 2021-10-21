@@ -99,14 +99,17 @@ int main(int argc, char *argv[]) {
 
 	FFT3D::Data data(size);
 
-	std::cout << "size: " << size << "x" <<
-		size << "x" << size << std::endl;
+	std::cout << "size: " <<
+		size << "x" << size << "x" << size <<
+		std::endl;
+
+
 	std::cout << "output file: " <<
 		output_file_name <<
 		" (" << FFT3D::Data::human_size(data.FileSize()) << ")" <<
 		std::endl;
-
-
+	data.WriteToRawFile(output_file_name);
+	std::cout << "done." << std::endl;
 
 	return 0;
 }
