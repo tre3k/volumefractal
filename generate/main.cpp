@@ -23,18 +23,19 @@
 #include <iostream>
 #include <getopt.h>
 #include <fft3ddata.h>
+#include <string>
 
 
 void help(char *progname) {
-
 	std::cout << "Usage: " << progname << " [options]" << std::endl;
 	std::cout << "Options: " << std::endl;
-	std::cout << "\t-h, --help\r\t\t\t\tThis message" << std::endl;
-
-	std::cout << "\t-s, --size=<size>" << std::endl;
-
+	std::cout << "\t-h, --help\r\t\t\t\t\tThis message" <<
+		std::endl;
+	std::cout << "\t-s, --size=<size>\r\t\t\t\t\tSize of data" <<
+		std::endl;
+	std::cout << "\t-o, --output=<filename>\r\t\t\t\t\tOutput filename" <<
+		std::endl;
 	std::cout << std::endl;
-
 }
 
 
@@ -47,13 +48,15 @@ int main(int argc, char *argv[]) {
 	std::cout << "Author: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
 		std::endl;
 
+	/* default options */
 	int size = 64;
-
+	std::string output_file_name = "out.raw";
 
 	int opt;
 	static struct option long_options[] = {
 		{"help", no_argument, 0, 'h'},
 		{"size", required_argument, 0, 's'},
+		{"output", required_argument, 0, 'o'},
 		{0, 0 ,0 ,0}
 	};
 
@@ -65,7 +68,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while(1) {
-		opt = getopt_long(argc, argv, "hs:",
+		opt = getopt_long(argc, argv, "hs:o:",
 				  long_options, &option_index);
 
 		if(opt < 0) break;
@@ -83,6 +86,10 @@ int main(int argc, char *argv[]) {
 			size = std::atoi(optarg);
 			break;
 
+		case 'o':
+			output_file_name = std::string(optarg);
+			break;
+
 		case '?':
 
 			break;
@@ -90,8 +97,15 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	FFT3D::Data data(size);
+
 	std::cout << "size: " << size << "x" <<
 		size << "x" << size << std::endl;
+	std::cout << "output file: " <<
+		output_file_name <<
+		" (" << data.FileSize() << " bytes )" <<
+		std::endl;
+
 
 
 	return 0;
