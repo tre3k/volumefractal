@@ -217,6 +217,8 @@ namespace FFT3D {
 				sizeof(std::complex<DATA_TYPE>);
 		}
 
+		void output_cube(bool magnitude = false);
+
 	};
 
 }

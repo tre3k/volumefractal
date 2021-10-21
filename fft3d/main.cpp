@@ -28,23 +28,6 @@
 #include "options.h"
 #include "fastfouriertransform3d.h"
 
-void output_cube(FFT3D::Data *data, bool magnitude = false){
-	for(int k=0;k<data->size_z();k++){
-		std::cout << std::endl << "Depth: " << k << std::endl;
-		for(int j=0;j<data->size_y();j++){
-			for(int i=0;i<data->size_x();i++){
-				if(magnitude)
-					std::cout << abs(data->getValue(i,j,k));
-				else
-					std::cout << data->getValue(i,j,k);
-				std::cout << "\r";
-				for(int l=0;l<i+1;l++) std::cout << "\t\t\t";
-			}
-			std::cout << std::endl;
-		}
-	}
-}
-
 void benchmark(unsigned int size,
 	       unsigned int threads,
 	       std::string filename,

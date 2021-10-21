@@ -271,3 +271,22 @@ std::string Data::human_size(unsigned long size){
 
 	return retval;
 }
+
+void Data::output_cube(bool magnitude){
+	for(int k=0;k<this->size_z();k++){
+		std::cout << std::endl << "Depth: " << k << std::endl;
+		for(int j=0;j<this->size_y();j++){
+			for(int i=0;i<this->size_x();i++){
+				if(magnitude)
+					std::cout <<
+						abs(this->getValue(i,j,k));
+				else
+					std::cout <<
+						this->getValue(i,j,k);
+				std::cout << "\r";
+				for(int l=0;l<i+1;l++) std::cout << "\t\t\t";
+			}
+			std::cout << std::endl;
+		}
+	}
+}
