@@ -42,10 +42,47 @@ void help(char *progname) {
 	std::cout << "\t-i, --itteration=<num>\r\t\t\t\t\t"
 		"Step itteration count" <<
 		std::endl;
+	std::cout << "\t-f, --fractal=<fractal>\r\t\t\t\t\t"
+		"select fractal like as:" << std::endl <<
+		"\r\t\t\t\t\t\"davinci\" - Da Vinci 3D tree" <<
+		std::endl;
+
 
 	std::cout << std::endl;
 }
 
+void generateDaVinci(bool default_size,
+		    int size,
+		    bool default_intteration,
+		    int iteration,
+		    std::string output_file_name) {
+
+	std::cout << "Da Vinci 3D tree!\n";
+	if(default_size)
+		size = Fractals::DaVince3D::getSizeFromItteration(
+			iteration-1
+			);
+
+	std::cout << "size: " <<
+		size << "x" << size << "x" << size <<
+		std::endl;
+
+	FFT3D::Data data(size);
+
+	Fractals::DaVince3D davince3d(&data, iteration-1);
+	if (default_intteration && !default_size)
+		davince3d.setMaximumItteration();
+	std::cout << "Start generate the tree of da Vinci: " <<
+		davince3d.getIteration()+1 << " steps iteration" << std::endl;
+
+	davince3d.generate();
+	std::cout << "write to output file: " <<
+		output_file_name <<
+		" (" << FFT3D::Data::human_size(data.FileSize()) << ")" <<
+		std::endl;
+	data.WriteToRawFile(output_file_name);
+	std::cout << "done." << std::endl;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -58,8 +95,16 @@ int main(int argc, char *argv[]) {
 
 	/* default options */
 	int size = 64;
+	bool default_size {true};
+
+	int iteration = 3;
+	bool default_intteration {true};
+
 	std::string output_file_name = "out.raw";
-	int itteration = 3;
+	bool default_output_file_name {true};
+
+	std::string str_fractal;
+	int fractal {0};
 
 	int opt;
 	static struct option long_options[] = {
@@ -67,6 +112,7 @@ int main(int argc, char *argv[]) {
 		{"size", required_argument, 0, 's'},
 		{"output", required_argument, 0, 'o'},
 		{"itteration", required_argument, 0, 'i'},
+		{"fractal", required_argument, 0, 'f'},
 		{0, 0 ,0 ,0}
 	};
 
@@ -78,7 +124,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while(1) {
-		opt = getopt_long(argc, argv, "hs:o:i:",
+		opt = getopt_long(argc, argv, "hs:o:i:f:",
 				  long_options, &option_index);
 
 		if(opt < 0) break;
@@ -94,14 +140,24 @@ int main(int argc, char *argv[]) {
 
 		case 's':
 			size = std::atoi(optarg);
+			default_size = false;
 			break;
 
 		case 'o':
 			output_file_name = std::string(optarg);
+			default_output_file_name = false;
 			break;
 
 		case 'i':
-			itteration = std::atoi(optarg);
+			iteration = std::atoi(optarg);
+			default_intteration = false;
+			break;
+
+		case 'f':
+			str_fractal = std::string(optarg);
+			if(str_fractal == "davinci") {
+				fractal = Fractals::DAVINCI;
+			}
 			break;
 
 		case '?':
@@ -111,21 +167,21 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	FFT3D::Data data(size);
+	switch(fractal){
+	case Fractals::DAVINCI:
+		generateDaVinci(default_size,
+			       size,
+			       default_intteration,
+			       iteration,
+			       output_file_name);
+		break;
+	}
 
-	std::cout << "size: " <<
-		size << "x" << size << "x" << size <<
-		std::endl;
-
-	Fractals::Davinche3D davinche3D(&data, 1);
-	davinche3D.generate();
-
-	std::cout << "write to output file: " <<
-		output_file_name <<
-		" (" << FFT3D::Data::human_size(data.FileSize()) << ")" <<
-		std::endl;
-	data.WriteToRawFile(output_file_name);
-	std::cout << "done." << std::endl;
+	if(str_fractal == "") {
+		help(argv[0]);
+		std::cout << "Please set option --fractal!" << std::endl;
+		exit(0);
+	}
 
 	return 0;
 }

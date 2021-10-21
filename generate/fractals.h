@@ -24,16 +24,41 @@
 #define FRACTALS_H
 
 #include <fft3ddata.h>
+#include <iostream>
 #include "primitives.h"
 
 namespace Fractals {
-	class Davinche3D {
+	enum FRACTALS {
+		FNULL,
+		DAVINCI
+	};
+
+	class DaVince3D {
 	protected:
 		FFT3D::Data *_data;
 
+		long int start_size_element {1};
+		int current_size_element = start_size_element;
+
+		int _iteration {0};
+
+
+		void element(FFT3D::acoord pos,
+			     int size,
+			     int age);
+
 	public:
-		Davinche3D(FFT3D::Data *data, int intteration = 1);
+		DaVince3D(FFT3D::Data *data, int iteration = 1);
+		void setIteration(int iteration);
+		int getIteration(void);
 		void generate(void);
+
+		/* This function determines the maximum number
+		   of iterations over the size of the array _data */
+		void setMaximumItteration(void);
+		/* This function returns the size of the array for
+		   a given number of iterations. */
+		static int getSizeFromItteration(int);
 	};
 };
 
