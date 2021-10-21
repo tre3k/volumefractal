@@ -21,11 +21,77 @@
 
 
 #include <iostream>
-
+#include <getopt.h>
 #include <fft3ddata.h>
 
-int main(int argc, char *argv[]){
 
+void help(char *progname) {
+
+	std::cout << "Usage: " << progname << " [options]" << std::endl;
+	std::cout << "Options: " << std::endl;
+	std::cout << "\t-h, --help\r\t\t\t\tThis message" << std::endl;
+
+	std::cout << "\t-s, --size=<size>" << std::endl;
+
+	std::cout << std::endl;
+
+}
+
+
+int main(int argc, char *argv[]) {
+
+	std::cout <<
+		"GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
+		"Gatchina, LO, 188300 Russia" <<
+		std::endl;
+	std::cout << "Author: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
+		std::endl;
+
+	int size = 64;
+
+
+	int opt;
+	static struct option long_options[] = {
+		{"help", no_argument, 0, 'h'},
+		{"size", required_argument, 0, 's'},
+		{0, 0 ,0 ,0}
+	};
+
+	int option_index {0};
+
+	if(argc < 2) {
+		help(argv[0]);
+		exit(0);
+	}
+
+	while(1) {
+		opt = getopt_long(argc, argv, "hs:",
+				  long_options, &option_index);
+
+		if(opt < 0) break;
+		switch(opt) {
+		case 0:
+
+			break;
+
+		case 'h':
+			help(argv[0]);
+			exit(0);
+			break;
+
+		case 's':
+			size = std::atoi(optarg);
+			break;
+
+		case '?':
+
+			break;
+
+		}
+	}
+
+	std::cout << "size: " << size << "x" <<
+		size << "x" << size << std::endl;
 
 
 	return 0;
