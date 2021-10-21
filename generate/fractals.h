@@ -20,53 +20,22 @@
  */
 
 
-#ifndef PRIMITIVES_H
-#define PRIMITIVES_H
+#ifndef FRACTALS_H
+#define FRACTALS_H
 
 #include <fft3ddata.h>
+#include "primitives.h"
 
-namespace Primitives {
-	/* Abstract class for shared properties */
-	class Primitive {
-	public:
-		Primitive(FFT3D::Data *data = nullptr,
-			  FFT3D::acoord center = {0, 0, 0}
-			);
-
-		virtual void paint(void) {};
-
+namespace Fractals {
+	class Davinche3D {
 	protected:
 		FFT3D::Data *_data;
-		// this is coordinate of the figure
-		FFT3D::acoord _center;
-		// this is coordinate of key pixel
-		FFT3D::acoord _key;
 
-	};
-
-	/* Cube class for paint cube =) */
-	class Cube : public Primitive {
-	protected:
-		int _a;
 	public:
-		Cube(FFT3D::Data *data = nullptr,
-		     int a = 1,
-		     FFT3D::acoord center = {0, 0, 0}
-			);
-
-		void setSize(int a);
-
-		void setKeyPosition(FFT3D::acoord key);
-		/* If I know center, I can calculate Key position */
-		void calculateKey(void);
-
-		void setCenterPosition(FFT3D::acoord center);
-		/* If I know key pos., I can calculate center position */
-		void calculateCenter(void);
-
-		void paint(void);
-
+		Davinche3D(FFT3D::Data *data, int intteration = 1);
+		void generate(void);
 	};
 };
+
 
 #endif

@@ -8,13 +8,13 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Foobar is distributed in the hope that it will be useful,
+ *  volumefractal is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
 
  *  You should have received a copy of the GNU General Public License
- *  along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with volumefractal.  If not, see <https://www.gnu.org/licenses/>.
  *
  *     Author: Kirill Pshenichnyi <pshcyrill@mail.ru>
  */
@@ -25,7 +25,7 @@
 #include <fft3ddata.h>
 #include <string>
 
-#include "primitives.h"
+#include "fractals.h"
 
 void help(char *progname) {
 	std::cout << "Usage: " << progname << " [options]" << std::endl;
@@ -117,10 +117,8 @@ int main(int argc, char *argv[]) {
 		size << "x" << size << "x" << size <<
 		std::endl;
 
-	Primitives::Cube cube(&data);
-	cube.setSize(30);
-	cube.setKeyPosition({60, 60, 40});
-	cube.paint();
+	Fractals::Davinche3D davinche3D(&data, 1);
+	davinche3D.generate();
 
 	std::cout << "write to output file: " <<
 		output_file_name <<

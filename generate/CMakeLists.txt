@@ -20,6 +20,7 @@ add_executable(
   generate
   main.cpp
   primitives.cpp primitives.h
+  fractals.cpp fractals.h
   )
 
 
