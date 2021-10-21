@@ -27,26 +27,42 @@
 
 #include "fractals.h"
 
+void version(){
+	std::cout << "generate 3D fractals, v0.9 betta" << std::endl;
+	std::cout <<
+		"GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
+		"Gatchina, LO, 188300 Russia" <<
+		std::endl;
+	std::cout << "\tAuthor: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
+		std::endl;
+
+	std::cout << "Source code: https://github.com/tre3k/volumefractal" <<
+		std::endl << std::endl;
+
+}
+
 void help(char *progname) {
+	version();
 	std::cout << "Usage: " << progname << " [options]" << std::endl;
 	std::cout << "Options: " << std::endl;
 
 	std::cout << "\t-h, --help\r\t\t\t\t\tThis message" <<
 		std::endl;
+	std::cout << "\t-v, --version\r\t\t\t\t\tShow version" <<
+		std::endl;
 	std::cout << "\t-s, --size=<size>\r\t\t\t\t\t"
-		"Size of data" <<
+		"Size of the array data <size>x<size>x<size>" <<
 		std::endl;
 	std::cout << "\t-o, --output=<filename>\r\t\t\t\t\t"
 		"Output filename" <<
 		std::endl;
-	std::cout << "\t-i, --itteration=<num>\r\t\t\t\t\t"
-		"Step itteration count" <<
+	std::cout << "\t-i, --iteration=<num>\r\t\t\t\t\t"
+		"Number of iteration steps" <<
 		std::endl;
 	std::cout << "\t-f, --fractal=<fractal>\r\t\t\t\t\t"
-		"select fractal like as:" << std::endl <<
-		"\r\t\t\t\t\t\"davinci\" - Da Vinci 3D tree" <<
+		"Selection of a fractal, such as:" << std::endl <<
+		"\r\t\t\t\t\t1. \"davinci\" - Da Vinci 3D tree" <<
 		std::endl;
-
 
 	std::cout << std::endl;
 }
@@ -85,14 +101,6 @@ void generateDaVinci(bool default_size,
 }
 
 int main(int argc, char *argv[]) {
-
-	std::cout <<
-		"GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
-		"Gatchina, LO, 188300 Russia" <<
-		std::endl;
-	std::cout << "Author: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
-		std::endl;
-
 	/* default options */
 	int size = 64;
 	bool default_size {true};
@@ -106,8 +114,10 @@ int main(int argc, char *argv[]) {
 	std::string str_fractal;
 	int fractal {0};
 
+	/* for opt = getopt(...) */
 	int opt;
 	static struct option long_options[] = {
+		{"version", no_argument, 0, 'v'},
 		{"help", no_argument, 0, 'h'},
 		{"size", required_argument, 0, 's'},
 		{"output", required_argument, 0, 'o'},
@@ -131,6 +141,11 @@ int main(int argc, char *argv[]) {
 		switch(opt) {
 		case 0:
 
+			break;
+
+		case 'v':
+			version();
+			exit(0);
 			break;
 
 		case 'h':
@@ -179,7 +194,7 @@ int main(int argc, char *argv[]) {
 
 	if(str_fractal == "") {
 		help(argv[0]);
-		std::cout << "Please set option --fractal!" << std::endl;
+		std::cout << "Please set option -f, --fractal!" << std::endl;
 		exit(0);
 	}
 

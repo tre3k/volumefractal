@@ -1,3 +1,5 @@
+![GitHub latest version](https://img.shields.io/github/v/tag/tre3k/volumefractal)
+
 # volumefractal
 Набор программ для обработки объёмных фракталов и получения их фрактальных размерностей
 
