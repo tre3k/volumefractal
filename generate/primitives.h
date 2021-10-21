@@ -64,6 +64,8 @@ namespace Primitives {
 		/* If I know key pos., I can calculate center position */
 		void calculateCenter(void);
 
+		void paint(void);
+
 	};
 };
 

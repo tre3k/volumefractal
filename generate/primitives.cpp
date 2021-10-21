@@ -21,7 +21,6 @@
 
 
 #include "primitives.h"
-
 using namespace Primitives;
 
 
@@ -39,6 +38,7 @@ Cube::Cube(FFT3D::Data *data,
 	) : Primitive(data, center) {
 
 	setSize(a);
+	setCenterPosition(center);
 }
 
 void Cube::setSize(int a){
@@ -56,9 +56,23 @@ void Cube::setCenterPosition(FFT3D::acoord center) {
 }
 
 void Cube::calculateKey() {
-
+	_key.i = _center.i - _a/2;
+	_key.j = _center.j - _a/2;
+	_key.k = _center.k - _a/2;
 }
 
 void Cube::calculateCenter() {
+	_center.i = _key.i + _a/2;
+	_center.j = _key.j + _a/2;
+	_center.k = _key.k + _a/2;
+}
 
+void Cube::paint() {
+	for(int i=_key.i; i<_a+_key.i; i++) {
+		for(int j=_key.j; j<_a+_key.j; j++) {
+			for(int k=_key.k; k<_a+_key.k; k++) {
+				_data->setValue(i, j, k, {1.0,0});
+			}
+		}
+	}
 }

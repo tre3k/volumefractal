@@ -104,8 +104,10 @@ int main(int argc, char *argv[]) {
 		size << "x" << size << "x" << size <<
 		std::endl;
 
-
 	Primitives::Cube cube(&data);
+	cube.setSize(30);
+	cube.setKeyPosition({60, 60, 40});
+	cube.paint();
 
 	std::cout << "write to output file: " <<
 		output_file_name <<
