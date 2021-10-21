@@ -45,8 +45,12 @@ namespace FFT3D {
 			_data = new std::complex<DATA_TYPE>[size];
 		}
 		unsigned long size(void){return _size;}
-		std::complex<DATA_TYPE>& operator[](unsigned long val){return _data[val];}
-		void setData(unsigned long index,std::complex<DATA_TYPE> val){_data[index] = val;}
+		std::complex<DATA_TYPE>& operator[](unsigned long val) {
+			return _data[val];
+		}
+		void setData(unsigned long index,std::complex<DATA_TYPE> val) {
+			_data[index] = val;
+		}
 
 	};
 
@@ -62,12 +66,18 @@ namespace FFT3D {
 			if(_data!= nullptr) delete _data;
 			_data = new std::complex<DATA_TYPE>[size*size];
 		}
+
 		unsigned long size(void){return _size;}
-		std::complex<DATA_TYPE> getValue(unsigned long i,unsigned long j){
+
+		std::complex<DATA_TYPE> getValue(unsigned long i,
+						 unsigned long j) {
 			unsigned long index = i + j*_size;
 			return _data[index];
 		}
-		void setValue(unsigned long i,unsigned long j,std::complex<DATA_TYPE> value){
+
+		void setValue(unsigned long i,
+			      unsigned long j,
+			      std::complex<DATA_TYPE> value) {
 			unsigned long index = i + j*_size;
 			_data[index] = value;
 			return;
@@ -93,44 +103,66 @@ namespace FFT3D {
 			size_t hash_data_type;
 		};
 
-		unsigned int getIndex(unsigned long i,unsigned long j,unsigned long k){
+		unsigned int getIndex(unsigned long i,
+				      unsigned long j,
+				      unsigned long k) {
 			unsigned long index {0};
 			index = i + j*_size_y + k*_size_y*_size_z;
 			return index;
 		}
 
-		std::complex<DATA_TYPE> getValue(unsigned long i,unsigned long j,unsigned long k){ return _data[getIndex(i,j,k)];}
-		void setValue(unsigned long i,unsigned long j,unsigned long k,std::complex<DATA_TYPE> val){ _data[getIndex(i,j,k)] = val;}
+		std::complex<DATA_TYPE> getValue(unsigned long i,
+						 unsigned long j,
+						 unsigned long k) {
+			return _data[getIndex(i,j,k)];
+		}
 
-		std::complex<DATA_TYPE> getRow(unsigned int i,unsigned int num){
+		void setValue(unsigned long i,
+			      unsigned long j,
+			      unsigned long k,
+			      std::complex<DATA_TYPE> val) {
+			_data[getIndex(i,j,k)] = val;
+		}
+
+		std::complex<DATA_TYPE> getRow(unsigned int i,
+					       unsigned int num) {
 			unsigned long k = (int)(num/_size_y);
 			unsigned long j = num - k*_size_y;
 			return getValue(i,j,k);
 		}
 
-		void setRow(unsigned int i,unsigned int num,std::complex<DATA_TYPE> val){
+		void setRow(unsigned int i,
+			    unsigned int num,std::complex<DATA_TYPE> val) {
 			unsigned long k = (int)(num/_size_y);
 			unsigned long j = num - k*_size_y;
 			return setValue(i,j,k,val);
 		}
 
-		std::complex<DATA_TYPE> getColumn(unsigned long j,unsigned long num){
+		std::complex<DATA_TYPE> getColumn(unsigned long j,
+						  unsigned long num) {
 			unsigned int k = (int)(num/_size_x);
 			unsigned int i = num - k*_size_x;
 			return getValue(i,j,k);
 		}
-		void setColumn(unsigned long j,unsigned long num,std::complex<DATA_TYPE> val){
+
+		void setColumn(unsigned long j,
+			       unsigned long num,
+			       std::complex<DATA_TYPE> val) {
 			unsigned int k = (int)(num/_size_x);
 			unsigned int i = num - k*_size_x;
 			return setValue(i,j,k,val);
 		}
 
-		std::complex<DATA_TYPE> getDepth(unsigned long k,unsigned long num){
+		std::complex<DATA_TYPE> getDepth(unsigned long k,
+						 unsigned long num) {
 			unsigned int j = (int)(num/_size_x);
 			unsigned int i = num - j*_size_x;
 			return getValue(i,j,k);
 		}
-		void setDepth(unsigned long k,unsigned long num,std::complex<DATA_TYPE> val){
+
+		void setDepth(unsigned long k,
+			      unsigned long num,
+			      std::complex<DATA_TYPE> val) {
 			unsigned int j = (int)(num/_size_x);
 			unsigned int i = num - j*_size_x;
 			return setValue(i,j,k,val);
@@ -147,16 +179,40 @@ namespace FFT3D {
 		void WriteToRawFile(std::string filename);
 		void ReadFromRawFile(std::string filename);
 		void ReadOnlyHeader(std::string filename);
-		static void Read2DLayerDepthFromFile(std::string filename, Data2D *data, unsigned long num_depth);
-		static void Read2DLayerSphereFromFile(std::string filename, Data2D *data, double r);
-		static void ReadColumnFromFile(std::string filename, Data1D *data, unsigned int row, unsigned int depth);
+		static void Read2DLayerDepthFromFile(std::string filename,
+						     Data2D *data,
+						     unsigned long num_depth);
+		static void Read2DLayerSphereFromFile(std::string filename,
+						      Data2D *data,
+						      double r);
+		static void ReadColumnFromFile(std::string filename,
+					       Data1D *data,
+					       unsigned int row,
+					       unsigned int depth);
 
-		static std::complex<DATA_TYPE> ReadValueFromFile(std::string filename, unsigned int row, unsigned int column, unsigned int depth);
-		static std::complex<DATA_TYPE> ReadValueFromFileInter(std::string filename, double i, double j, double k, unsigned int size);  // i,j and k range from -0.5 to 0.5
-		static std::complex<DATA_TYPE> ReadValueSphere(std::string filename, double r, double phi, double theta); // -0.5 < r < 0.5, angles in degree
+		static std::complex<DATA_TYPE>
+		ReadValueFromFile(std::string filename,
+				  unsigned int row,
+				  unsigned int column,
+				  unsigned int depth);
+		/* Interpolation  i,j and k range from -0.5 to 0.5 */
+		static std::complex<DATA_TYPE>
+		ReadValueFromFileInter(std::string filename,
+				       double i,
+				       double j,
+				       double k,
+				       unsigned int size);
+		/* -0.5 < r < 0.5, angles in degree */
+		static std::complex<DATA_TYPE>
+		ReadValueSphere(std::string filename,
+				double r,
+				double phi,
+				double theta);
 
 		unsigned long long FileSize(void){
-			return sizeof(s_raw_file_header)+_size_x*_size_y*_size_z*sizeof(std::complex<DATA_TYPE>);
+			return sizeof(s_raw_file_header) +
+				_size_x*_size_y*_size_z *
+				sizeof(std::complex<DATA_TYPE>);
 		}
 
 	};
