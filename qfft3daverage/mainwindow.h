@@ -48,8 +48,6 @@ public:
         QVector<double> radius;
         QVector<double> intencity;
 
-
-
         void run() override {
                 if(_filename == "") return;
 
@@ -98,7 +96,7 @@ public:
                         emit remain((int)(tremain/1000));
                 }
 
-                emit finish(radius,intencity);
+                emit finish(radius, intencity);
         }
 
 private:
@@ -209,6 +207,7 @@ private:
                 QMenuBar *menu_bar;
                 QMenu *file_menu;
                 QAction *open;
+                QAction *export_dat;
                 QAction *exit;
         } menu_bar;
 
@@ -221,15 +220,20 @@ private:
                 menu_bar.open = new QAction("&Open");
                 menu_bar.file_menu->addAction(menu_bar.open);
 
+                menu_bar.export_dat = new QAction("&Export intencity");
+                menu_bar.file_menu->addAction(menu_bar.export_dat);
+
 
                 menu_bar.exit= new QAction("&Exit");
                 menu_bar.file_menu->addAction(menu_bar.exit);
 
                 this->setMenuBar(menu_bar.menu_bar);
                 connect(menu_bar.open, SIGNAL(triggered()),
-			this, SLOT(OpenFile()));
-                connect(menu_bar.exit, SIGNAL(triggered()),
-			this, SLOT(close()));
+                        this, SLOT(OpenFile()));
+                connect(menu_bar.export_dat, SIGNAL(triggered()),
+                        this, SLOT(ExportIntencityDat()));
+                connect(menu_bar.exit, &QAction::triggered,
+                        this, &MainWindow::ExportIntencityDat);
         }
 
         /* filename */
@@ -264,6 +268,8 @@ public slots:
                 viewer->SetMaxDepth(size);
                 viewer->setCurrentDepth(size/2);
         }
+
+        void ExportIntencityDat(void);
 
 signals:
 

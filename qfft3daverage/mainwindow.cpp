@@ -210,7 +210,7 @@ Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
         _data = new FFT3D::Data2D(0);
 }
 
-void Widgets::Average::finish(QVector<double> r,QVector<double> intencity) {
+void Widgets::Average::finish(QVector<double> r, QVector<double> intencity) {
         plot_average->clearGraphs();
         plot_average->addCurve(&r, &intencity, true, QColor("black"), "test");
 }
@@ -258,4 +258,21 @@ void Widgets::SphericalViewer::Show(double r) {
         plot_case_phase->plot2D->ColorMap->rescaleDataRange(true);
         plot_case_phase->plot2D->rescaleAxes();
         plot_case_phase->plot2D->replot();
+}
+
+void MainWindow::ExportIntencityDat() {
+        filename = QFileDialog::getSaveFileName(nullptr,
+                                                "Export *dat file",
+                                                "", "*.dat");
+        if(filename=="") return;
+        QFile f(filename);
+        f.open(QIODevice::WriteOnly);
+        QTextStream ts(&f);
+
+        for(int i=0; i<thread_average->intencity.size(); i++){
+                ts << thread_average->radius[i] << "\t" <<
+                thread_average->intencity[i] << "\n";
+        }
+
+        f.close();
 }
