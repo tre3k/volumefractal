@@ -230,10 +230,10 @@ private:
                 this->setMenuBar(menu_bar.menu_bar);
                 connect(menu_bar.open, SIGNAL(triggered()),
                         this, SLOT(OpenFile()));
-                connect(menu_bar.export_dat, SIGNAL(triggered()),
-                        this, SLOT(ExportIntencityDat()));
+                connect(menu_bar.export_dat, &QAction::triggered,
+                this, &MainWindow::ExportIntencityDat);
                 connect(menu_bar.exit, &QAction::triggered,
-                        this, &MainWindow::ExportIntencityDat);
+                        this, &MainWindow::close);
         }
 
         /* filename */
