@@ -67,6 +67,13 @@ namespace Primitives {
 		void paint(void);
 
 	};
+
+	class Pinholl : public Primitive {
+	public:
+		Pinholl(FFT3D::Data *data = nullptr,
+			FFT3D::acoord center = {0, 0, 0});
+		void paint(void);
+	};
 };
 
 #endif

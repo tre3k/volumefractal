@@ -76,3 +76,16 @@ void Cube::paint() {
 		}
 	}
 }
+
+
+Pinholl::Pinholl(FFT3D::Data *data,
+		 FFT3D::acoord center
+	) : Primitive(data, center) {
+}
+
+void Pinholl::paint() {
+	_data->setValue(_center.i,
+			_center.j,
+			_center.k,
+			{1.0, 0.0});
+}

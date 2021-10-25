@@ -62,6 +62,8 @@ void help(char *progname) {
 	std::cout << "\t-f, --fractal=<fractal>\r\t\t\t\t\t"
 		"Selection of a fractal, such as:" << std::endl <<
 		"\r\t\t\t\t\t1. \"davinci\" - Da Vinci 3D tree" <<
+		std::endl <<
+		"\r\t\t\t\t\t2. \"pinholl\" - Just one pixel in center" <<
 		std::endl;
 
 	std::cout << std::endl;
@@ -113,6 +115,9 @@ int main(int argc, char *argv[]) {
 
 	std::string str_fractal;
 	int fractal {0};
+
+
+	FFT3D::Data *data;
 
 	/* for opt = getopt(...) */
 	int opt;
@@ -173,6 +178,9 @@ int main(int argc, char *argv[]) {
 			if(str_fractal == "davinci") {
 				fractal = Fractals::DAVINCI;
 			}
+			if(str_fractal == "pinholl") {
+				fractal = Fractals::PINHOLL;
+			}
 			break;
 
 		case '?':
@@ -182,21 +190,46 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	switch(fractal){
-	case Fractals::DAVINCI:
-		generateDaVinci(default_size,
-			       size,
-			       default_intteration,
-			       iteration,
-			       output_file_name);
-		break;
-	}
-
 	if(str_fractal == "") {
 		help(argv[0]);
 		std::cout << "Please set option -f, --fractal!" << std::endl;
-		exit(0);
+		return 0;
 	}
+
+	switch(fractal){
+	default:
+		std::cout << "Please set correct option for fractal " <<
+			"see --help" << std::endl;
+		return 0;
+		break;
+
+	case Fractals::DAVINCI:
+		generateDaVinci(default_size,
+				size,
+				default_intteration,
+				iteration,
+				output_file_name);
+		break;
+
+	case Fractals::PINHOLL:
+		data = new FFT3D::Data(size);
+		FFT3D::acoord center = {
+			(unsigned long) size/2,
+			(unsigned long) size/2,
+			(unsigned long) size/2
+		};
+		Primitives::Pinholl ph(data, center);
+		ph.paint();
+		break;
+
+	}
+
+	std::cout << "write to output file: " <<
+		output_file_name <<
+		" (" << FFT3D::Data::human_size(data->FileSize()) << ")" <<
+		std::endl;
+	data->WriteToRawFile(output_file_name);
+	std::cout << "done." << std::endl;
 
 	return 0;
 }
