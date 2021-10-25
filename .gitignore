@@ -1,6 +1,9 @@
 /lib/
 /bin/
-*.raw
 /tmp/
+
+*.raw
 *.dat
 *.log
+
+README.html
