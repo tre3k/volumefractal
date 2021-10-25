@@ -74,6 +74,11 @@ namespace Primitives {
 			FFT3D::acoord center = {0, 0, 0});
 		void paint(void);
 	};
+
+	class Sphere : public Primitive {
+
+
+	};
 };
 
 #endif
