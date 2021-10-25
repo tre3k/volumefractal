@@ -290,3 +290,37 @@ void Data::output_cube(bool magnitude){
 		}
 	}
 }
+
+rcoord Data::aToRcoord(acoord coord) {
+	rcoord retVal;
+	int half = _size_x/2;
+
+	if(coord.double_flag){
+		retVal = {
+			((coord.di - half)/_size_x),
+			((coord.dj - half)/_size_x),
+			((coord.dk - half)/_size_x),
+		};
+	} else {
+		retVal = {
+			((double)(coord.i - half)/_size_x),
+			((double)(coord.j - half)/_size_x),
+			((double)(coord.k - half)/_size_x),
+		};
+	}
+
+
+	return retVal;
+}
+
+void Data::syncAccord(acoord *coord) {
+	if(!coord->double_flag){
+		coord->di = (double) coord->i;
+		coord->dj = (double) coord->j;
+		coord->dk = (double) coord->k;
+	}else{
+		coord->i = (int)(coord->di + 0.5);
+		coord->j = (int)(coord->dj + 0.5);
+		coord->k = (int)(coord->dk + 0.5);
+	}
+}

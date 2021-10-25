@@ -30,10 +30,15 @@
 
 namespace FFT3D {
 #define DATA_TYPE double
+
+	// absolute coordinates 0 .. size
 	typedef struct s_acoord {
 		unsigned long i, j, k;
+		double di, dj, dk;
+		bool double_flag = false;
 	} acoord;
 
+	// reletive coordinates -0.5 .. 0.5
 	typedef struct s_rcoord {
 		double i, j, k;
 	} rcoord;
@@ -117,11 +122,24 @@ namespace FFT3D {
 			return index;
 		}
 
+		// get value without load (for next future)
+		// std::complex<DATA_TYPE> getValueFromFile(std::string filename,
+		// 					 unsigned long i,
+		// 					 unsigned long j,
+		// 					 unsigned long k);
+
 		std::complex<DATA_TYPE> getValue(unsigned long i,
 						 unsigned long j,
 						 unsigned long k) {
 			return _data[getIndex(i,j,k)];
 		}
+
+		// set Value without load (for next future)
+		// void setValueFromFile(std::string filename,
+		// 		      unsigned long i,
+		// 		      unsigned long j,
+		// 		      unsigned long k,
+		// 		      std::complex<DATA_TYPE> val);
 
 		void setValue(unsigned long i,
 			      unsigned long j,
@@ -198,6 +216,8 @@ namespace FFT3D {
 
 		static std::string human_size(unsigned long size);
 
+		rcoord aToRcoord(acoord coord);
+
 		static std::complex<DATA_TYPE>
 		ReadValueFromFile(std::string filename,
 				  unsigned int row,
@@ -224,6 +244,7 @@ namespace FFT3D {
 		}
 
 		void output_cube(bool magnitude = false);
+		static void syncAccord(acoord *coord);
 
 	};
 

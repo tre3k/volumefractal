@@ -13,6 +13,7 @@ link_directories(${LIB_PATH})
 add_executable(
   average
   main.cpp
+  average.cpp average.h
   )
 
 
