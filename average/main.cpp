@@ -25,10 +25,34 @@
 
 #include "average.h"
 
-void help(char *prgname) {
-	std::cout << "Usage: " << prgname << "[options]" << std::endl;
-	std::cout << "Options: " << std::endl;
+void version(){
+	std::cout << "averate utility, (volumefractals) v0.9 betta"
+		  << std::endl;
+	std::cout << "GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
+		"Gatchina, LO, 188300 Russia" <<
+		std::endl;
+	std::cout << "\tAuthor: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
+		std::endl << std::endl;
+
+	std::cout << "Source code: https://github.com/tre3k/volumefractal" <<
+		std::endl << std::endl;
 }
+
+void help(char *prgname) {
+	version();
+	std::cout << prgname << " [options]" << std::endl;
+	std::cout << "options: " << std::endl;
+	std::cout << "\t-h, --help\r\t\t\t\t" <<
+		"Show this message" << std::endl;
+	std::cout << "\t-v, --version\r\t\t\t\t" <<
+		"Show version" << std::endl;
+	std::cout << "\t-i, --input=<file.raw>\r\t\t\t\t" <<
+		"Set input volume raw file" << std::endl;
+	std::cout << "\t-o, --output=<file.dat>\r\t\t\t\t" <<
+		"Set output *.dat file for plotting" << std::endl;
+	std::cout << std::endl;
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -64,6 +88,10 @@ int main(int argc, char *argv[]) {
 		case 'h':
 			help(argv[0]);
 			return 0;
+			break;
+
+		case 'v':
+			version();
 			break;
 
 		case 'i':
@@ -112,6 +140,7 @@ int main(int argc, char *argv[]) {
 
 	Average average(&data);
 	auto tmp = average.findCenterMass();
+	std::cout << "Center of mass: " << std::endl;
 	std::cout << tmp.di << " " << tmp.dj << " " << tmp.dk << std::endl;
 
 	return 0;
