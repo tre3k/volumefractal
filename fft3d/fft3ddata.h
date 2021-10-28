@@ -94,6 +94,11 @@ namespace FFT3D {
 			return;
 		}
 
+		static void toCircle(double *x,
+				     double *y,
+				     double r,
+				     double phi);
+
 	};
 
 	class Data {
@@ -245,6 +250,14 @@ namespace FFT3D {
 
 		void output_cube(bool magnitude = false);
 		static void syncAccord(acoord *coord);
+
+		/* convert from spherical coordinates to decart */
+		static void fromSphere(double *x,
+				       double *y,
+				       double *z,
+				       double r,
+				       double theta,
+				       double phi);
 
 	};
 

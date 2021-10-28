@@ -24,6 +24,16 @@
 
 using namespace FFT3D;
 
+void Data2D::toCircle(double *x,
+		      double *y,
+		      double r,
+		      double phi){
+	phi = 2*M_PI*phi/360;
+	*x = r*cos(phi);
+	*y = r*sin(phi);
+	return;
+}
+
 Data::Data(unsigned long int size) {
 	_size_x = size;
 	_size_y = _size_x;
@@ -323,4 +333,16 @@ void Data::syncAccord(acoord *coord) {
 		coord->j = (int)(coord->dj + 0.5);
 		coord->k = (int)(coord->dk + 0.5);
 	}
+}
+
+void Data::fromSphere(double *x,
+		      double *y,
+		      double *z,
+		      double r,
+		      double theta,
+		      double phi) {
+
+	*x = r * sin(theta) * cos(phi);
+	*y = r * sin(theta) * sin(phi);
+	*z = r * cos(theta);
 }

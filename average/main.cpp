@@ -132,16 +132,24 @@ int main(int argc, char *argv[]) {
 			std::cin >> status;
 			if(status == "n" || status == "q") return 0;
 		}
-
 	}
+
+
 	std::cout << "load file..." << std::endl;
 	data.ReadFromRawFile(in_file);
 	std::cout << "ok." << std::endl;
 
 	Average average(&data);
-	auto tmp = average.findCenterMass();
+	auto center_mass = average.findCenterMass();
 	std::cout << "Center of mass: " << std::endl;
-	std::cout << tmp.di << " " << tmp.dj << " " << tmp.dk << std::endl;
+	std::cout <<
+		"x = " << center_mass.di <<
+		", y = " << center_mass.dj <<
+		", z = " << center_mass.dk << std::endl;
+
+	FFT3D::Data::syncAccord(&center_mass);
+	auto res = average.average(center_mass);
+	for(auto r : res.value) std::cout << r << std::endl;
 
 	return 0;
 }
