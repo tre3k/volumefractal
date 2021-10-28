@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 
 set(PROGRAM_NAME qfft3daverage)
 project(${PROGRAM_NAME})
