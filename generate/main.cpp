@@ -69,39 +69,6 @@ void help(char *progname) {
 	std::cout << std::endl;
 }
 
-void generateDaVinci(bool default_size,
-		    int size,
-		    bool default_intteration,
-		    int iteration,
-		    std::string output_file_name) {
-
-	std::cout << "Da Vinci 3D tree!\n";
-	if(default_size)
-		size = Fractals::DaVince3D::getSizeFromItteration(
-			iteration-1
-			);
-
-	std::cout << "size: " <<
-		size << "x" << size << "x" << size <<
-		std::endl;
-
-	FFT3D::Data data(size);
-
-	Fractals::DaVince3D davince3d(&data, iteration-1);
-	if (default_intteration && !default_size)
-		davince3d.setMaximumItteration();
-	std::cout << "Start generate the tree of da Vinci: " <<
-		davince3d.getIteration()+1 << " steps iteration" << std::endl;
-
-	davince3d.generate();
-	std::cout << "write to output file: " <<
-		output_file_name <<
-		" (" << FFT3D::Data::human_size(data.FileSize()) << ")" <<
-		std::endl;
-	data.WriteToRawFile(output_file_name);
-	std::cout << "done." << std::endl;
-}
-
 int main(int argc, char *argv[]) {
 	/* default options */
 	int size = 64;
@@ -118,6 +85,8 @@ int main(int argc, char *argv[]) {
 
 
 	FFT3D::Data *data;
+	Fractals::DaVince3D *davince3d;
+
 
 	/* for opt = getopt(...) */
 	int opt;
@@ -196,6 +165,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+
 	switch(fractal){
 	default:
 		std::cout << "Please set correct option for fractal " <<
@@ -204,11 +174,24 @@ int main(int argc, char *argv[]) {
 		break;
 
 	case Fractals::DAVINCI:
-		generateDaVinci(default_size,
-				size,
-				default_intteration,
-				iteration,
-				output_file_name);
+		std::cout << "Da Vinci 3D tree!\n";
+		if(default_size)
+			size = Fractals::DaVince3D::getSizeFromItteration(
+				iteration-1
+				);
+
+		std::cout << "size: " <<
+			size << "x" << size << "x" << size <<
+			std::endl;
+
+		data = new FFT3D::Data(size);
+		davince3d = new Fractals::DaVince3D(data, iteration-1);
+		if (default_intteration && !default_size)
+			davince3d->setMaximumItteration();
+		std::cout << "Start generate the tree of da Vinci: " <<
+			davince3d->getIteration()+1 << " steps iteration" <<
+			std::endl;
+		davince3d->generate();
 		break;
 
 	case Fractals::PINHOLL:
@@ -226,7 +209,7 @@ int main(int argc, char *argv[]) {
 
 	std::cout << "write to output file: " <<
 		output_file_name <<
-		" (" << FFT3D::Data::human_size(data->FileSize()) << ")" <<
+		" (" << FFT3D::Data::human_size(data->FileSize()) << ")..." <<
 		std::endl;
 	data->WriteToRawFile(output_file_name);
 	std::cout << "done." << std::endl;
