@@ -21,6 +21,8 @@
 
 
 #include <iostream>
+#include <fstream>
+
 #include <getopt.h>
 
 #include "average.h"
@@ -50,6 +52,9 @@ void help(char *prgname) {
 		"Set input volume raw file" << std::endl;
 	std::cout << "\t-o, --output=<file.dat>\r\t\t\t\t" <<
 		"Set output *.dat file for plotting" << std::endl;
+	std::cout << "\t--noconfirm\r\t\t\t\t" <<
+		"Do not ask for any confirmation" << std::endl;
+
 	std::cout << std::endl;
 }
 
@@ -149,7 +154,26 @@ int main(int argc, char *argv[]) {
 
 	FFT3D::Data::syncAccord(&center_mass);
 	auto res = average.average(center_mass);
-	for(auto r : res.value) std::cout << r << std::endl;
+
+	std::ofstream outfile(out_file.c_str());
+	if(!outfile) {
+		std::cout << "unable to open or create file: \'" <<
+			out_file << "\'!" << std::endl;
+		exit(0);
+	}
+
+	for(int i = 0; i < res.value.size(); i++) {
+		std::cout << res.r[i] << "\t" <<
+			abs(res.value[i])*abs(res.value[i]) <<
+			std::endl;
+		outfile << res.r[i] << "\t" <<
+			abs(res.value[i])*abs(res.value[i]) <<
+			std::endl;
+
+	}
+
+
+	std::cout << "Write result to: \'" << out_file << "\'" << std::endl;
 
 	return 0;
 }

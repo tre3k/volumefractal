@@ -1,3 +1,26 @@
+/*
+ *  Copyright (c) 2020-2021 NRC KI PNPI, Gatchina, LO, 188300 Russia
+ *
+ *  This file is part of volumefractal (average).
+ *
+ *  volumefractal is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  volumefractal is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with volumefractal.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *     Author: Kirill Pshenichnyi <pshcyrill@mail.ru>
+ */
+
+
+#include <complex>
 #include "average.h"
 
 Average::Average(FFT3D::Data *data) {
@@ -69,14 +92,71 @@ std::complex<DATA_TYPE> Average::getPointFrom2DAverage(std::string filename,
 }
 
 Average::averages Average::average(FFT3D::acoord center){
-	std::complex<DATA_TYPE> S {0.0, 0.0};
 	averages retVal;
 
+	std::complex<DATA_TYPE> S {0.0, 0.0};
+	int count {0};
 
+	double r, theta, phi;
 	double x, y, z;
-	int ix, iy, iz;
+	int ix {0}, iy {0}, iz {0};
+
+	// тут необходимо посчитать максимальный радиусвектор
+	double mr = (double) _data->size_x()/2;
+
+	FFT3D::Data::syncAccord(&center);
+
+	double dr = sqrt(3);
+	double dphi;
+	double dtheta;
 
 
+	r = 3;
+	theta = -M_PI/2;
+	phi = M_PI/2;
+
+	// -pi <= phi < pi
+	// 0 <= theta < pi
+
+	/* Стартовая точка, при нулевом радиус-векторе - центр  */
+	retVal.r.push_back(0);
+	retVal.value.push_back(
+		_data->getValue(center.i,
+				center.j,
+				center.k)
+		);
+
+	for(r = dr; r < mr; r += dr) {
+		for(theta = 0; theta < M_PI; theta += dtheta) {
+			for(phi = -M_PI; phi < M_PI; phi += dphi){
+
+				dphi = atan(1.0/r);
+				dtheta = atan(1.0/r);
+
+				_data->fromSphere(&x, &y, &z,
+						  r, theta, phi);
+
+				ix = doubleToInt(x) + center.i;
+				iy = doubleToInt(y) + center.j;
+				iz = doubleToInt(z) + center.k;
+
+				S += _data->getValue(ix, iy, iz);
+				count ++;
+
+				/* если theta = 0, то мы крутимся на одном
+				   месте в полюсе поэтому достаточно взять
+				   одну точку */
+				if(theta == 0) break;
+			}
+		}
+
+		S = S / (double) count;
+
+		retVal.r.push_back(r);
+		retVal.value.push_back(S);
+		S = {0.0, 0.0};
+		count = 0;
+	}
 
 	return retVal;
 }
