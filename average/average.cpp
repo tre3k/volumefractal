@@ -106,7 +106,7 @@ Average::averages Average::average(FFT3D::acoord center){
 
 	FFT3D::Data::syncAccord(&center);
 
-	double dr = sqrt(3);
+	double dr = sqrt(1);
 	double dphi;
 	double dtheta;
 
@@ -130,8 +130,8 @@ Average::averages Average::average(FFT3D::acoord center){
 		for(theta = 0; theta < M_PI; theta += dtheta) {
 			for(phi = -M_PI; phi < M_PI; phi += dphi){
 
-				dphi = atan(1.0/r);
-				dtheta = atan(1.0/r);
+				dphi = atan(0.1/r);
+				dtheta = atan(0.1/r);
 
 				_data->fromSphere(&x, &y, &z,
 						  r, theta, phi);
