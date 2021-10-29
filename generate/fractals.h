@@ -31,6 +31,7 @@ namespace Fractals {
 	enum FRACTALS {
 		FNULL,
 		PINHOLL,           // from Primitives namespace
+		SPHERA,
 		DAVINCI
 	};
 

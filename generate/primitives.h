@@ -24,6 +24,7 @@
 #define PRIMITIVES_H
 
 #include <fft3ddata.h>
+#include <average.h>
 
 namespace Primitives {
 	/* Abstract class for shared properties */
@@ -67,6 +68,20 @@ namespace Primitives {
 		void paint(void);
 
 	};
+
+
+	class Sphera : public Primitive {
+	protected:
+		int _r {5};           // radius
+	public:
+		Sphera(FFT3D::Data *data,
+		       FFT3D::acoord center = {6, 6, 6},
+		       int radius = 5);
+
+		void setRadius(int r);
+		void paint(void);
+	};
+
 
 	class Pinholl : public Primitive {
 	public:

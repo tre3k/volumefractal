@@ -59,11 +59,15 @@ void help(char *progname) {
 	std::cout << "\t-i, --iteration=<num>\r\t\t\t\t\t"
 		"Number of iteration steps" <<
 		std::endl;
+	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
+		"Do not ask for any confirmation" << std::endl;
 	std::cout << "\t-f, --fractal=<fractal>\r\t\t\t\t\t"
 		"Selection of a fractal, such as:" << std::endl <<
 		"\r\t\t\t\t\t1. \"davinci\" - Da Vinci 3D tree" <<
 		std::endl <<
 		"\r\t\t\t\t\t2. \"pinholl\" - Just one pixel in center" <<
+		std::endl <<
+		"\r\t\t\t\t\t3. \"sphera\" - Draw sphera" <<
 		std::endl;
 
 	std::cout << std::endl;
@@ -87,6 +91,10 @@ int main(int argc, char *argv[]) {
 	FFT3D::Data *data;
 	Fractals::DaVince3D *davince3d;
 
+	Primitives::Pinholl *pinholl;
+	Primitives::Sphera *sphera;
+
+	int no_confirm_flag {0};
 
 	/* for opt = getopt(...) */
 	int opt;
@@ -97,6 +105,7 @@ int main(int argc, char *argv[]) {
 		{"output", required_argument, 0, 'o'},
 		{"itteration", required_argument, 0, 'i'},
 		{"fractal", required_argument, 0, 'f'},
+		{"noconfirm", no_argument, &no_confirm_flag, 1},
 		{0, 0 ,0 ,0}
 	};
 
@@ -144,12 +153,21 @@ int main(int argc, char *argv[]) {
 
 		case 'f':
 			str_fractal = std::string(optarg);
-			if(str_fractal == "davinci") {
+			if(str_fractal == "davinci" || str_fractal == "1") {
+				str_fractal = "davinci";
 				fractal = Fractals::DAVINCI;
 			}
-			if(str_fractal == "pinholl") {
+
+			if(str_fractal == "pinholl" || str_fractal == "2"){
+				str_fractal = "pinholl";
 				fractal = Fractals::PINHOLL;
 			}
+
+			if(str_fractal == "sphera" || str_fractal == "3") {
+				str_fractal = "sphera";
+				fractal = Fractals::SPHERA;
+			}
+
 			break;
 
 		case '?':
@@ -165,12 +183,49 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+	std::cout << "generate " << str_fractal << "object." << std::endl;
+	std::cout << "size: " << size << "x" <<
+		size << "x" << size <<
+		" (" << FFT3D::Data::human_size(
+			sizeof(std::complex<DATA_TYPE>) *
+			size * size * size) <<
+		")" << std::endl;
+
+	std::string status;
+	if(!no_confirm_flag) {
+		status = "";
+		std::cout << "do you want to continue? ";
+		while(status != "y"){
+			std::cout << "y/n: ";
+			std::cin >> status;
+			if(status == "n" || status == "q") return 0;
+		}
+	}
+
+
+	FFT3D::acoord center = {
+		(unsigned long) size/2,
+		(unsigned long) size/2,
+		(unsigned long) size/2
+	};
 
 	switch(fractal){
 	default:
 		std::cout << "Please set correct option for fractal " <<
 			"see --help" << std::endl;
 		return 0;
+		break;
+
+	case Fractals::SPHERA:
+		data = new FFT3D::Data(size);
+		sphera = new Primitives::Sphera(data, center, size/4);
+		sphera->paint();
+		break;
+
+	case Fractals::PINHOLL:
+		data = new FFT3D::Data(size);
+		pinholl = new Primitives::Pinholl(data, center);
+		pinholl->paint();
 		break;
 
 	case Fractals::DAVINCI:
@@ -192,17 +247,6 @@ int main(int argc, char *argv[]) {
 			davince3d->getIteration()+1 << " steps iteration" <<
 			std::endl;
 		davince3d->generate();
-		break;
-
-	case Fractals::PINHOLL:
-		data = new FFT3D::Data(size);
-		FFT3D::acoord center = {
-			(unsigned long) size/2,
-			(unsigned long) size/2,
-			(unsigned long) size/2
-		};
-		Primitives::Pinholl ph(data, center);
-		ph.paint();
 		break;
 
 	}
