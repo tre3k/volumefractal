@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	std::cout << "generate " << str_fractal << "object." << std::endl;
+	std::cout << "generate " << str_fractal << " object." << std::endl;
 	std::cout << "size: " << size << "x" <<
 		size << "x" << size <<
 		" (" << FFT3D::Data::human_size(
