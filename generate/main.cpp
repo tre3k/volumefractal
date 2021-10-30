@@ -223,7 +223,9 @@ int main(int argc, char *argv[]) {
 	case Fractals::SPHERA:
 		confirm(no_confirm_flag, size);
 		data = new FFT3D::Data(size);
-		sphera = new Primitives::Sphera(data, center, size/4);
+		sphera = new Primitives::Sphera(data,
+						center,
+						size/2/iteration);
 		sphera->paint();
 		break;
 
