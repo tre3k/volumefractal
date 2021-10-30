@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	std::cout << "load file " << in_file << std::endl;
+	std::cout << "file " << in_file << std::endl;
 	FFT3D::Data data(0);
 	data.ReadOnlyHeader(in_file);
 	std::cout << "size: " << data.size_x() << "x" <<
@@ -145,12 +145,14 @@ int main(int argc, char *argv[]) {
 	std::cout << "ok." << std::endl;
 
 	Average average(&data);
-	auto center_mass = average.findCenterMass();
 	std::cout << "Center of mass: " << std::endl;
+	auto center_mass = average.findCenterMass();
 	std::cout <<
 		"x = " << center_mass.di <<
 		", y = " << center_mass.dj <<
-		", z = " << center_mass.dk << std::endl;
+		", z = " << center_mass.dk <<
+		std::endl <<
+		"average in process..." << std::endl;
 
 	FFT3D::Data::syncAccord(&center_mass);
 	auto res = average.average(center_mass);
@@ -162,18 +164,19 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
+	outfile << "# pix\tx\tI " << std::endl;
 	for(int i = 0; i < res.value.size(); i++) {
 		std::cout << res.r[i] << "\t" <<
-			abs(res.value[i])*abs(res.value[i]) <<
+			res.r[i]*M_PI << "\t" <<
+			res.value[i] <<
 			std::endl;
 		outfile << res.r[i] << "\t" <<
-			abs(res.value[i])*abs(res.value[i]) <<
+			res.r[i]*M_PI << "\t" <<
+			res.value[i] <<
 			std::endl;
 
 	}
 
-
 	std::cout << "Write result to: \'" << out_file << "\'" << std::endl;
-
 	return 0;
 }
