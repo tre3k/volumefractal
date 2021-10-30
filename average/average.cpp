@@ -93,8 +93,10 @@ std::complex<DATA_TYPE> Average::getPointFrom2DAverage(std::string filename,
 
 Average::averages Average::average(FFT3D::acoord center){
 	averages retVal;
+	retVal.r.clear();
+	retVal.value.clear();
 
-	std::complex<DATA_TYPE> S {0.0, 0.0};
+	double S {0.0};
 	int count {0};
 
 	double r, theta, phi;
@@ -106,9 +108,11 @@ Average::averages Average::average(FFT3D::acoord center){
 
 	FFT3D::Data::syncAccord(&center);
 
-	double dr = sqrt(1);
+	double dr = sqrt(3);
 	double dphi;
 	double dtheta;
+
+	std::complex<DATA_TYPE> tmp;
 
 
 	r = 3;
@@ -120,18 +124,19 @@ Average::averages Average::average(FFT3D::acoord center){
 
 	/* Стартовая точка, при нулевом радиус-векторе - центр  */
 	retVal.r.push_back(0);
-	retVal.value.push_back(
-		_data->getValue(center.i,
-				center.j,
-				center.k)
-		);
+	tmp = _data->getValue(center.i,
+			      center.j,
+			      center.k);
+
+	retVal.value.push_back(tmp.real() * tmp.real() +
+			       tmp.imag() * tmp.imag());
 
 	for(r = dr; r < mr; r += dr) {
 		for(theta = 0; theta < M_PI; theta += dtheta) {
 			for(phi = -M_PI; phi < M_PI; phi += dphi){
 
-				dphi = atan(0.1/r);
-				dtheta = atan(0.1/r);
+				dphi = atan(1.0/r);
+				dtheta = atan(1.0/r);
 
 				_data->fromSphere(&x, &y, &z,
 						  r, theta, phi);
@@ -140,7 +145,9 @@ Average::averages Average::average(FFT3D::acoord center){
 				iy = doubleToInt(y) + center.j;
 				iz = doubleToInt(z) + center.k;
 
-				S += _data->getValue(ix, iy, iz);
+				tmp = _data->getValue(ix, iy, iz);
+				S += tmp.real() * tmp.real() +
+					tmp.imag() * tmp.imag();
 				count ++;
 
 				/* если theta = 0, то мы крутимся на одном
@@ -154,7 +161,8 @@ Average::averages Average::average(FFT3D::acoord center){
 
 		retVal.r.push_back(r);
 		retVal.value.push_back(S);
-		S = {0.0, 0.0};
+
+		S = 0.0;
 		count = 0;
 	}
 

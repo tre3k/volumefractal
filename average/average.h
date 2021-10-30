@@ -43,7 +43,7 @@ public:
 						      double r);
 
 	struct s_averages{
-		std::vector<std::complex<DATA_TYPE>> value;
+		std::vector<double> value;
 		std::vector<double> r;
 	} typedef averages;
 
