@@ -73,6 +73,27 @@ void help(char *progname) {
 	std::cout << std::endl;
 }
 
+void confirm(int flag, unsigned long size) {
+	std::cout << "size: " << size << "x" <<
+		size << "x" << size <<
+		" (" << FFT3D::Data::human_size(
+			sizeof(std::complex<DATA_TYPE>) *
+			size * size * size) <<
+		")" << std::endl;
+
+	std::string status;
+	if(!flag) {
+		status = "";
+		std::cout << "do you want to continue? ";
+		while(status != "y"){
+			std::cout << "y/n: ";
+			std::cin >> status;
+			if(status == "n" || status == "q") exit(0);
+		}
+	}
+
+}
+
 int main(int argc, char *argv[]) {
 	/* default options */
 	int size = 64;
@@ -184,23 +205,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::cout << "generate " << str_fractal << " object." << std::endl;
-	std::cout << "size: " << size << "x" <<
-		size << "x" << size <<
-		" (" << FFT3D::Data::human_size(
-			sizeof(std::complex<DATA_TYPE>) *
-			size * size * size) <<
-		")" << std::endl;
-
-	std::string status;
-	if(!no_confirm_flag) {
-		status = "";
-		std::cout << "do you want to continue? ";
-		while(status != "y"){
-			std::cout << "y/n: ";
-			std::cin >> status;
-			if(status == "n" || status == "q") return 0;
-		}
-	}
 
 
 	FFT3D::acoord center = {
@@ -217,12 +221,14 @@ int main(int argc, char *argv[]) {
 		break;
 
 	case Fractals::SPHERA:
+		confirm(no_confirm_flag, size);
 		data = new FFT3D::Data(size);
 		sphera = new Primitives::Sphera(data, center, size/4);
 		sphera->paint();
 		break;
 
 	case Fractals::PINHOLL:
+		confirm(no_confirm_flag, size);
 		data = new FFT3D::Data(size);
 		pinholl = new Primitives::Pinholl(data, center);
 		pinholl->paint();
@@ -235,9 +241,7 @@ int main(int argc, char *argv[]) {
 				iteration-1
 				);
 
-		std::cout << "size: " <<
-			size << "x" << size << "x" << size <<
-			std::endl;
+		confirm(no_confirm_flag, size);
 
 		data = new FFT3D::Data(size);
 		davince3d = new Fractals::DaVince3D(data, iteration-1);
