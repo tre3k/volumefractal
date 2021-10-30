@@ -64,7 +64,7 @@ void help(std::string prg) {
 		std::endl;
 	std::cout << "\t-b, --benchmark=<size>\r\t\t\t\t" <<
 		"Benchmark for size x size x size" <<
-		std::endl;
+		std::endl << std::endl;
 
 }
 
