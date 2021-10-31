@@ -30,13 +30,13 @@
 #include "fastfouriertransform3d.h"
 
 void version(){
-	std::cout << "3D fast fourier transform, (volumefractals) v0.9 betta"
+	std::cout << "3D fast fourier transform, (volumefractals) v0.9.1"
 		  << std::endl;
 	std::cout << "GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
 		"Gatchina, LO, 188300 Russia" <<
 		std::endl;
 	std::cout << "\tAuthor: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
-		std::endl << std::endl;
+		std::endl;
 
 	std::cout << "Source code: https://github.com/tre3k/volumefractal" <<
 		std::endl << std::endl;
@@ -59,12 +59,14 @@ void help(std::string prg) {
 	std::cout << "\t-j, --jobs=<num>\r\t\t\t\t" <<
 		"Number of threads" <<
 		std::endl;
+	std::cout << "\t-b, --benchmark=<size>\r\t\t\t\t" <<
+		"Benchmark for size x size x size" <<
+		std::endl;
 	std::cout << "\t--noconfirm\r\t\t\t\t" <<
 		"Do not ask for confirmation" <<
 		std::endl;
-	std::cout << "\t-b, --benchmark=<size>\r\t\t\t\t" <<
-		"Benchmark for size x size x size" <<
-		std::endl << std::endl;
+
+	std::cout << std::endl;
 
 }
 

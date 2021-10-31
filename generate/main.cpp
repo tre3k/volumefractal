@@ -28,7 +28,7 @@
 #include "fractals.h"
 
 void version(){
-	std::cout << "generate 3D fractals, v0.9 betta" << std::endl;
+	std::cout << "generate 3D fractals, v0.9.1" << std::endl;
 	std::cout <<
 		"GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
 		"Gatchina, LO, 188300 Russia" <<
@@ -59,8 +59,6 @@ void help(char *progname) {
 	std::cout << "\t-i, --iteration=<num>\r\t\t\t\t\t"
 		"Number of iteration steps" <<
 		std::endl;
-	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
-		"Do not ask for any confirmation" << std::endl;
 	std::cout << "\t-f, --fractal=<fractal>\r\t\t\t\t\t"
 		"Selection of a fractal, such as:" << std::endl <<
 		"\r\t\t\t\t\t1. \"davinci\" - Da Vinci 3D tree" <<
@@ -69,6 +67,8 @@ void help(char *progname) {
 		std::endl <<
 		"\r\t\t\t\t\t3. \"sphera\" - Draw sphera" <<
 		std::endl;
+	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
+		"Do not ask for any confirmation" << std::endl;
 
 	std::cout << std::endl;
 }
