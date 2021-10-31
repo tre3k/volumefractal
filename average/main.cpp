@@ -28,13 +28,13 @@
 #include "average.h"
 
 void version(){
-	std::cout << "averate utility, (volumefractals) v0.9 betta"
+	std::cout << "averate utility, (volumefractals) v0.9.1"
 		  << std::endl;
 	std::cout << "GPLv3 (c) Copyright (c) 2020-2021 NRC KI PNPI, "
 		"Gatchina, LO, 188300 Russia" <<
 		std::endl;
 	std::cout << "\tAuthor: Kirill Pshenichnyi <pshcyrill@mail.ru>" <<
-		std::endl << std::endl;
+		std::endl;
 
 	std::cout << "Source code: https://github.com/tre3k/volumefractal" <<
 		std::endl << std::endl;
