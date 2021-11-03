@@ -39,15 +39,20 @@ namespace Fractals {
 	protected:
 		FFT3D::Data *_data;
 
-		long int start_size_element {1};
-		int current_size_element = start_size_element;
+		/* minimum of element size,
+		   need calculate for space size */
+		int minimum_size_element {1};
 
 		int _iteration {0};
+		FFT3D::acoord position {0, 0, 0};
 
 
 		void element(FFT3D::acoord pos,
-			     int size,
+			     int size,             // size of minimum element
 			     int age);
+		/* if you want know full size,
+		   you need: size * size_element(age) */
+
 
 	public:
 		DaVince3D(FFT3D::Data *data, int iteration = 1);
@@ -60,7 +65,13 @@ namespace Fractals {
 		void setMaximumItteration(void);
 		/* This function returns the size of the array for
 		   a given number of iterations. */
-		static int getSizeFromItteration(int);
+		static int getSizeFromIteration(int);
+
+		void setMinimumSizeElement(int);
+		void setPosition(FFT3D::acoord pos);
+
+		static int SizeElement(int age);
+		static int SizeCentral(int age);
 	};
 };
 

@@ -27,113 +27,115 @@ using namespace Fractals;
 
 DaVince3D::DaVince3D(FFT3D::Data *data, int iteration) {
 	_data = data;
-	/* set maximum size of element from size of array _data,
-	   we can place 4 elements in space */
-	start_size_element = _data->size_x()/4;
 	setIteration(iteration);
 }
 
 void DaVince3D::element(FFT3D::acoord pos,
 			 int size,
 			 int age) {
-	if(age == 1) {
+
+	int shift = size * SizeElement(age-1);
+	int c_size = size * SizeCentral(age);
+
+	if(age == 2) {
 		std::vector<Primitives::Cube> cubes;
-		for(int i=0; i<8; i++){
+		for(int i=0; i < 8; i++){
 			Primitives::Cube cube(_data);
 			cube.setSize(size);
 			cubes.push_back(cube);
 		}
 		cubes[0].setKeyPosition(pos);
 		cubes[1].setKeyPosition({
-				pos.i + (int)(3 * size),
+				pos.i + c_size + shift,
 				pos.j,
 				pos.k,
 			});
 		cubes[2].setKeyPosition({
 				pos.i,
-				pos.j + (int)(3 * size),
+				pos.j + c_size + shift,
 				pos.k,
 			});
 		cubes[3].setKeyPosition({
-				pos.i + (int)(3 * size),
-				pos.j + (int)(3 * size),
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
 				pos.k,
 			});
 		cubes[4].setKeyPosition({
 				pos.i,
 				pos.j,
-				pos.k + (int)(3 * size),
+				pos.k + c_size + shift,
 			});
 		cubes[5].setKeyPosition({
-				pos.i + (int)(3 * size),
+				pos.i + c_size + shift,
 				pos.j,
-				pos.k + (int)(3 * size),
+				pos.k + c_size + shift,
 			});
 		cubes[6].setKeyPosition({
 				pos.i,
-				pos.j + (int)(3 * size),
-				pos.k + (int)(3 * size),
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
 			});
 		cubes[7].setKeyPosition({
-				pos.i + (int)(3 * size),
-				pos.j + (int)(3 * size),
-				pos.k + (int)(3 * size),
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
 			});
 		for(int i=0; i<8; i++) cubes[i].paint();
 	}
 
-	if(age > 1) {
-		element(pos, size/4, age-1);
+	if(age > 2) {
+		element(pos, size, age-1);
 		element({
-				pos.i + (int)(3 * size),
+				pos.i + c_size + shift,
 				pos.j,
 				pos.k,
-			}, size/4, age-1);
+			}, size, age-1);
 		element({
 				pos.i,
-				pos.j + (int)(3 * size),
+				pos.j + c_size + shift,
 				pos.k,
-			}, size/4, age-1);
+			}, size, age-1);
 		element({
-				pos.i + (int)(3 * size),
-				pos.j + (int)(3 * size),
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
 				pos.k,
-			}, size/4, age-1);
+			}, size, age-1);
 		element({
 				pos.i,
 				pos.j,
-				pos.k + (int)(3 * size),
-			}, size/4, age-1);
+				pos.k + c_size + shift,
+			}, size, age-1);
 		element({
-				pos.i + (int)(3 * size),
+				pos.i + c_size + shift,
 				pos.j,
-				pos.k + (int)(3 * size),
-			}, size/4, age-1);
+				pos.k + c_size + shift,
+			}, size, age-1);
 		element({
 				pos.i,
-				pos.j + (int)(3 * size),
-				pos.k + (int)(3 * size),
-			}, size/4, age-1);
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
+			}, size, age-1);
 		element({
-				pos.i + (int)(3 * size),
-				pos.j + (int)(3 * size),
-				pos.k + (int)(3 * size),
-			}, size/4, age-1);
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
+			}, size, age-1);
 	}
 
+
 	Primitives::Cube central_cube(_data);
-	central_cube.setSize(2*size);
+	central_cube.setSize(c_size);
 	central_cube.setKeyPosition({
-			pos.i + size,
-			pos.j + size,
-			pos.k + size,
+			pos.i + shift,
+			pos.j + shift,
+			pos.k + shift,
 		});
 	central_cube.paint();
 }
 
 void DaVince3D::generate() {
-	element({0, 0, 0},
-		start_size_element,
+	element(position,
+		minimum_size_element,
 		_iteration);
 }
 
@@ -145,11 +147,37 @@ int DaVince3D::getIteration() {
 	return _iteration;
 }
 
-/* size = 4^iteration */
 void DaVince3D::setMaximumItteration() {
-	_iteration = log(_data->size_x())/log(4);
+	_iteration = 1;
+	int size = _data->size_x();
+	while(size >= minimum_size_element * SizeElement(_iteration)){
+		_iteration ++;
+	}
+	_iteration --;
 }
 
-int DaVince3D::getSizeFromItteration(int intteration) {
-	return pow(4, intteration);
+int DaVince3D::getSizeFromIteration(int iteration) {
+	return SizeElement(iteration);
+}
+
+/* return size of element (central cube + 8 elements (n-1) step)
+   from step iteration "age" */
+int DaVince3D::SizeElement(int age) {
+	if(age <= 0) return 0;
+	if(age == 1) return 1;
+	return SizeCentral(age) + 2 * SizeElement(age-1);
+}
+
+/* return size of central cube from step iteration "age" */
+int DaVince3D::SizeCentral(int age) {
+	if(age <= 1) return 1;
+	return 2 * SizeCentral(age-1);
+}
+
+void DaVince3D::setMinimumSizeElement(int size) {
+	minimum_size_element = size;
+}
+
+void DaVince3D::setPosition(FFT3D::acoord pos) {
+	position = pos;
 }

@@ -69,6 +69,9 @@ void help(char *progname) {
 		std::endl;
 	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
 		"Do not ask for any confirmation" << std::endl;
+	std::cout << "\t--minimum-size=<size>\r\t\t\t\t\t" <<
+		"Size of minimum element (for \"davinci\" fractal)" <<
+		std::endl;
 
 	std::cout << std::endl;
 }
@@ -108,6 +111,7 @@ int main(int argc, char *argv[]) {
 	std::string str_fractal;
 	int fractal {0};
 
+	int minimum_size_element {1};
 
 	FFT3D::Data *data;
 	Fractals::DaVince3D *davince3d;
@@ -127,6 +131,7 @@ int main(int argc, char *argv[]) {
 		{"itteration", required_argument, 0, 'i'},
 		{"fractal", required_argument, 0, 'f'},
 		{"noconfirm", no_argument, &no_confirm_flag, 1},
+		{"minimum-size", required_argument, 0, 0},
 		{0, 0 ,0 ,0}
 	};
 
@@ -144,7 +149,10 @@ int main(int argc, char *argv[]) {
 		if(opt < 0) break;
 		switch(opt) {
 		case 0:
-
+			if(std::string(long_options[option_index].name) ==
+			   std::string("minimum-size")) {
+				minimum_size_element = std::atoi(optarg);
+			}
 			break;
 
 		case 'v':
@@ -206,7 +214,6 @@ int main(int argc, char *argv[]) {
 
 	std::cout << "generate " << str_fractal << " object." << std::endl;
 
-
 	FFT3D::acoord center = {
 		(unsigned long) size/2,
 		(unsigned long) size/2,
@@ -239,19 +246,32 @@ int main(int argc, char *argv[]) {
 	case Fractals::DAVINCI:
 		std::cout << "Da Vinci 3D tree!\n";
 		if(default_size)
-			size = Fractals::DaVince3D::getSizeFromItteration(
-				iteration-1
-				);
+			size = minimum_size_element *
+				Fractals::DaVince3D::getSizeFromIteration(
+					iteration
+					);
 
 		confirm(no_confirm_flag, size);
 
 		data = new FFT3D::Data(size);
-		davince3d = new Fractals::DaVince3D(data, iteration-1);
+		davince3d = new Fractals::DaVince3D(data, iteration);
+		davince3d->setMinimumSizeElement(minimum_size_element);
 		if (default_intteration && !default_size)
 			davince3d->setMaximumItteration();
+		iteration = davince3d->getIteration();
 		std::cout << "Start generate the tree of da Vinci: " <<
-			davince3d->getIteration()+1 << " steps iteration" <<
+			iteration << " steps iteration" <<
 			std::endl;
+		davince3d->setPosition(
+			{data->size_x()/2 -
+			 minimum_size_element *
+			 davince3d->SizeElement(iteration)/2,
+			 data->size_y()/2 -
+			 minimum_size_element *
+			 davince3d->SizeElement(iteration)/2,
+			 data->size_z()/2 -
+			 minimum_size_element *
+			 davince3d->SizeElement(iteration)/2});
 		davince3d->generate();
 		break;
 
