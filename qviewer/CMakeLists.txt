@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(PROGRAM_NAME qfft3daverage)
+set(PROGRAM_NAME qviewer)
 project(${PROGRAM_NAME})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

@@ -3,7 +3,7 @@ QT += core \
       printsupport \
       widgets
 
-TARGET = qfft3daverage
+TARGET = qviewer
 TEMPLATE = app
 
 INCLUDEPATH += $$PWD/../fft3d
