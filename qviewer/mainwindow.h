@@ -45,7 +45,7 @@
 namespace Widgets{
 	class Viewer : public QWidget{
 		Q_OBJECT
-	private:
+        protected:
 		QHBoxLayout *layout;
 		QVBoxLayout *layout_depth;
 		iCasePlot2D *plot_case_ampl;
@@ -71,9 +71,21 @@ namespace Widgets{
                 }
 	};
 
-        class Amount : public QWidget{
+        class Amount : public QWidget {
+                Q_OBJECT
+        protected:
+                QString _filename = "";
+                iCasePlot2D *plot_case_ampl;
+                iCasePlot2D *plot_case_phase;
+                FFT3D::Data2D *_data = nullptr;
+                int _size = 0;
         public:
                 Amount(QWidget *parent = nullptr);
+                void setFilename(QString filename);
+                void setSize(int size);
+
+        public slots:
+                void process();
         };
 }
 
@@ -94,10 +106,10 @@ private:
 
         void BuildMenu(void);
 
-        /* filename */
         QString filename;
 
         Widgets::Viewer *viewer;
+        Widgets::Amount *amount;
 
 public:
 

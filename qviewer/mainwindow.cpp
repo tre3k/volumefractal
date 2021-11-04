@@ -30,14 +30,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
         BuildMenu();
 
+        /* Create widgets */
         viewer = new Widgets::Viewer();
         viewer->setMinimumSize(10,10);
+        amount = new Widgets::Amount();
+        amount->setMinimumSize(10,10);
 
 
         QTabWidget *central_tab_widget = new QTabWidget();
         this->setCentralWidget(central_tab_widget);
 
         central_tab_widget->addTab(viewer, "Viewer");
+        central_tab_widget->addTab(amount, "Amount");
 }
 
 void MainWindow::BuildMenu(){
@@ -79,6 +83,9 @@ void MainWindow::OpenFile(){
         viewer->setFileName(filename);
         viewer->SetMaxDepth(size);
         viewer->setCurrentDepth(size/2);
+
+        amount->setFilename(filename);
+        amount->setSize(size);
 }
 
 void MainWindow::ExportIntencityDat() {
@@ -164,3 +171,91 @@ void Widgets::Viewer::ShowDepth(int depth) {
         plot_case_phase->plot2D->replot();
 }
 
+
+/* Amount widget */
+
+Widgets::Amount::Amount(QWidget *parent) : QWidget(parent) {
+        /* init objects for place on widget */
+        QVBoxLayout *layout = new QVBoxLayout();
+        QHBoxLayout *plot_layout = new QHBoxLayout();
+        QHBoxLayout *butt_layout = new QHBoxLayout();
+        QPushButton *amount_button = new QPushButton("amount all depth");
+        plot_case_ampl = new iCasePlot2D();
+        plot_case_phase = new iCasePlot2D();
+
+        /* set windgets and layouts schema */
+        plot_layout->addWidget(plot_case_ampl);
+        plot_layout->addWidget(plot_case_phase);
+        butt_layout->addWidget(amount_button);
+        butt_layout->addStretch();
+        layout->addLayout(plot_layout);
+        layout->addLayout(butt_layout);
+        this->setLayout(layout);
+
+        connect(amount_button, &QPushButton::released,
+                this, &Amount::process);
+}
+
+void Widgets::Amount::setFilename(QString filename){
+        _filename = filename;
+}
+
+void Widgets::Amount::setSize(int size){
+        _size = size;
+}
+
+void Widgets::Amount::process(){
+        if(_filename == "") return;
+        if(_data != nullptr) delete _data;
+        _data = new FFT3D::Data2D(_size);
+
+        std::complex<DATA_TYPE> tmp;
+        FFT3D::Data2D *tmp_data;
+        tmp_data = new FFT3D::Data2D(_size);
+
+        for(int depth = 0; depth < _size; depth++){
+                FFT3D::Data::Read2DLayerDepthFromFile(_filename.toStdString(),
+                                                      tmp_data, depth);
+
+                for(int i=0; i<_size; i++){
+                        for(int j=0; j<_size; j++){
+                                tmp = _data->getValue(i, j);
+                                tmp += tmp_data->getValue(i, j);
+                                _data->setValue(i, j, tmp);
+                        }
+                }
+        }
+
+        delete tmp_data;
+
+        /* ploting result */
+        plot_case_ampl->plot2D->ColorMap->data()->setSize(_size, _size);
+        plot_case_ampl->plot2D->ColorMap->data()->setRange(QCPRange(0, _size),
+                                                           QCPRange(0, _size));
+
+        for(unsigned long i=0; i < _size; i++){
+                for(unsigned long j = 0; j < _size; j++){
+                        plot_case_ampl->plot2D->ColorMap->data()->
+                                setCell(i, j, abs(_data->getValue(i,j)));
+                }
+        }
+
+        plot_case_ampl->plot2D->ColorMap->rescaleDataRange(true);
+        plot_case_ampl->plot2D->rescaleAxes();
+        plot_case_ampl->plot2D->replot();
+
+        plot_case_phase->plot2D->ColorMap->data()->setSize(_size, _size);
+        plot_case_phase->plot2D->ColorMap->data()->setRange(QCPRange(0, _size),
+                                                            QCPRange(0, _size));
+
+        for(unsigned long i=0; i<_size; i++){
+                for(unsigned long j=0; j<_size; j++){
+                        plot_case_phase->plot2D->ColorMap->data()->
+                                setCell(i, j, arg(_data->getValue(i, j)));
+                }
+        }
+
+        plot_case_phase->plot2D->ColorMap->rescaleDataRange(true);
+        plot_case_phase->plot2D->rescaleAxes();
+        plot_case_phase->plot2D->replot();
+}
