@@ -32,28 +32,57 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
         viewer = new Widgets::Viewer();
         viewer->setMinimumSize(10,10);
-        spherical_viewer = new Widgets::SphericalViewer();
-        average = new Widgets::Average();
 
 
         QTabWidget *central_tab_widget = new QTabWidget();
         this->setCentralWidget(central_tab_widget);
 
         central_tab_widget->addTab(viewer, "Viewer");
-        central_tab_widget->addTab(spherical_viewer, "Spherical Viewer");
-        central_tab_widget->addTab(average, "Average");
+}
 
-        thread_average = new ThreadAverage();
-        connect(average->button_average, SIGNAL(pressed()),
-		thread_average, SLOT(start()));
-        connect(thread_average,
-		SIGNAL(finish(QVector<double>, QVector<double>)),
-		average,
-		SLOT(finish(QVector<double>, QVector<double>)));
-        connect(thread_average, SIGNAL(progress(int)),
-		average, SLOT(setProgress(int)));
-        connect(thread_average, SIGNAL(remain(int)),
-		average, SLOT(remainTime(int)));
+void MainWindow::BuildMenu(){
+        menu_bar.menu_bar = new QMenuBar();
+
+        menu_bar.file_menu = new QMenu("&File");
+        menu_bar.menu_bar->addMenu(menu_bar.file_menu);
+
+        menu_bar.open = new QAction("&Open");
+        menu_bar.file_menu->addAction(menu_bar.open);
+
+        menu_bar.export_dat = new QAction("&Export intencity");
+        menu_bar.file_menu->addAction(menu_bar.export_dat);
+
+
+        menu_bar.exit= new QAction("&Exit");
+        menu_bar.file_menu->addAction(menu_bar.exit);
+
+        this->setMenuBar(menu_bar.menu_bar);
+        connect(menu_bar.open, &QAction::triggered,
+                this, &MainWindow::OpenFile);
+        connect(menu_bar.export_dat, &QAction::triggered,
+        this, &MainWindow::ExportIntencityDat);
+        connect(menu_bar.exit, &QAction::triggered,
+                this, &MainWindow::close);
+}
+
+void MainWindow::OpenFile(){
+        filename = QFileDialog::getOpenFileName(nullptr,
+                                                "Open FFT3D file",
+                                                "",
+                                                "*.raw");
+        if(filename=="") return;
+
+        FFT3D::Data data(0);
+        data.ReadOnlyHeader(filename.toStdString());
+        unsigned long size = data.size_x();
+
+        viewer->setFileName(filename);
+        viewer->SetMaxDepth(size);
+        viewer->setCurrentDepth(size/2);
+}
+
+void MainWindow::ExportIntencityDat() {
+
 }
 
 /* VIEWER Widget */
@@ -86,7 +115,7 @@ Widgets::Viewer::Viewer(QWidget *parent) : QWidget(parent) {
         this->setLayout(layout);
 
         connect(spin_box_depth, SIGNAL(valueChanged(int)),
-		slider, SLOT(setValue(int)));
+                slider, SLOT(setValue(int)));
         connect(spin_box_depth, SIGNAL(valueChanged(int)),
 		this, SLOT(ShowDepth(int)));
         connect(slider, SIGNAL(valueChanged(int)),
@@ -135,144 +164,3 @@ void Widgets::Viewer::ShowDepth(int depth) {
         plot_case_phase->plot2D->replot();
 }
 
-/* AVERAGE Widget */
-Widgets::Average::Average(QWidget *parent) : QWidget(parent){
-        plot_average = new iQCustomPlot();
-        plot_average->xAxis->setLabel("r, arb. units");
-        plot_average->yAxis->setLabel("Intencity");
-        button_average = new QPushButton("average");
-        progress_bar = new QProgressBar();
-        remain_time = new QLabel("time left: ");
-
-        auto leftLayout = new QVBoxLayout();
-        auto layout = new QHBoxLayout();
-
-        plot_average->setSizePolicy(QSizePolicy::Expanding,
-				    QSizePolicy::Expanding);
-        progress_bar->setSizePolicy(QSizePolicy::Minimum,
-				    QSizePolicy::Minimum);
-        progress_bar->setMaximumHeight(10);
-        progress_bar->setTextVisible(false);
-
-        leftLayout->addWidget(button_average);
-        leftLayout->addWidget(progress_bar);
-        leftLayout->addWidget(remain_time);
-        leftLayout->addStretch();
-
-        layout->addWidget(plot_average);
-        layout->addLayout(leftLayout);
-
-        this->setLayout(layout);
-
-}
-
-/* SphericalViewer Widget */
-Widgets::SphericalViewer::SphericalViewer(QWidget *parent) : QWidget(parent){
-        auto plotLayout = new QHBoxLayout();
-        auto radiusLayout = new QVBoxLayout();
-        auto layout = new QVBoxLayout();
-
-        slider_radius = new QSlider();
-        slider_radius->setRange(0,500);
-        spin_box_radius = new QDoubleSpinBox();
-        spin_box_radius->setRange(0,0.5); // * 1000
-        spin_box_radius->setDecimals(5);
-        spin_box_radius->setSingleStep(0.01);
-
-        radiusLayout->addWidget(new QLabel("r, a.u."));
-        radiusLayout->addWidget(spin_box_radius);
-        radiusLayout->addWidget(slider_radius);
-
-        plot_case_ampl = new iCasePlot2D();
-        plot_case_phase = new iCasePlot2D();
-        plot_case_ampl->plot2D->xAxis->setLabel("φ, deg.");
-        plot_case_ampl->plot2D->yAxis->setLabel("θ, deg.");
-        plot_case_phase->plot2D->xAxis->setLabel("φ, deg.");
-        plot_case_phase->plot2D->yAxis->setLabel("θ, deg.");
-        plot_case_phase->plot2D->ColorScale->axis()->setTicker(
-		QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
-        plot_case_ampl->slot_log(true);
-        plot_case_ampl->checkBoxLog->setChecked(true);
-
-        plotLayout->addWidget(plot_case_ampl);
-        plotLayout->addWidget(plot_case_phase);
-        plotLayout->addLayout(radiusLayout);
-
-        layout->addLayout(plotLayout);
-
-        this->setLayout(layout);
-
-        connect(spin_box_radius, SIGNAL(valueChanged(double)),
-		this, SLOT(Show(double)));
-        connect(slider_radius, SIGNAL(valueChanged(int)),
-		this, SLOT(syncSpinBox(int)));
-
-        _data = new FFT3D::Data2D(0);
-}
-
-void Widgets::Average::finish(QVector<double> r, QVector<double> intencity) {
-        plot_average->clearGraphs();
-        plot_average->addCurve(&r, &intencity, true, QColor("black"), "test");
-}
-
-void Widgets::SphericalViewer::Show(double r) {
-        slider_radius->setValue(r*1000);
-
-        if(_filename == "") return;
-
-        // FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(),
-	// 				       _data, phi, theta);
-        // std::cout << FFT3D::Data::ReadValueSphere(_filename.toStdString(),
-	// 					  0.1, phi, theta) << "\n";
-
-        FFT3D::Data::Read2DLayerSphereFromFile(_filename.toStdString(),
-					       _data, r);
-
-        unsigned long size = _data->size();
-        plot_case_ampl->plot2D->ColorMap->data()->setSize(size, size);
-        plot_case_ampl->plot2D->ColorMap->data()->
-		setRange(QCPRange(-180, 180), QCPRange(-180, 180));
-
-        for(unsigned long i=0; i<size; i++){
-                for(unsigned long j=0; j<size; j++){
-                        plot_case_ampl->plot2D->ColorMap->data()->
-				setCell(i, j, abs(_data->getValue(i, j)));
-                }
-        }
-
-        plot_case_ampl->plot2D->ColorMap->rescaleDataRange(true);
-        plot_case_ampl->plot2D->rescaleAxes();
-        plot_case_ampl->plot2D->replot();
-
-        plot_case_phase->plot2D->ColorMap->data()->setSize(size,size);
-        plot_case_phase->plot2D->ColorMap->data()->
-		setRange(QCPRange(-180, 180), QCPRange(-180, 180));
-
-        for(unsigned long i=0; i<size; i++){
-                for(unsigned j=0; j<size; j++){
-                        plot_case_phase->plot2D->ColorMap->data()->
-				setCell(i, j, arg(_data->getValue(i, j)));
-                }
-        }
-
-        plot_case_phase->plot2D->ColorMap->rescaleDataRange(true);
-        plot_case_phase->plot2D->rescaleAxes();
-        plot_case_phase->plot2D->replot();
-}
-
-void MainWindow::ExportIntencityDat() {
-        filename = QFileDialog::getSaveFileName(nullptr,
-                                                "Export *dat file",
-                                                "", "*.dat");
-        if(filename=="") return;
-        QFile f(filename);
-        f.open(QIODevice::WriteOnly);
-        QTextStream ts(&f);
-
-        for(int i=0; i<thread_average->intencity.size(); i++){
-                ts << thread_average->radius[i] << "\t" <<
-                thread_average->intencity[i] << "\n";
-        }
-
-        f.close();
-}
