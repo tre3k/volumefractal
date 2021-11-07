@@ -38,7 +38,6 @@ void version(){
 
 	std::cout << "Source code: https://github.com/tre3k/volumefractal" <<
 		std::endl << std::endl;
-
 }
 
 void help(char *progname) {
@@ -72,6 +71,11 @@ void help(char *progname) {
 	std::cout << "\t--minimum-size=<size>\r\t\t\t\t\t" <<
 		"Size of minimum element (for \"davinci\" fractal)" <<
 		std::endl;
+	std::cout << "\t--speed=<value>\r\t\t\t\t\t" <<
+		"the rate of growth of the fractal, the rule of increase\n"
+		"\r\t\t\t\t\twith each iteration step" <<
+		std::endl;
+
 
 	std::cout << std::endl;
 }
@@ -110,6 +114,7 @@ int main(int argc, char *argv[]) {
 
 	std::string str_fractal;
 	int fractal {0};
+	int speed {0};
 
 	int minimum_size_element {1};
 
@@ -132,6 +137,7 @@ int main(int argc, char *argv[]) {
 		{"fractal", required_argument, 0, 'f'},
 		{"noconfirm", no_argument, &no_confirm_flag, 1},
 		{"minimum-size", required_argument, 0, 0},
+		{"speed", required_argument, 0, 0},
 		{0, 0 ,0 ,0}
 	};
 
@@ -143,7 +149,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while(1) {
-		opt = getopt_long(argc, argv, "hs:o:i:f:",
+		opt = getopt_long(argc, argv, "vhs:o:i:f:",
 				  long_options, &option_index);
 
 		if(opt < 0) break;
@@ -153,6 +159,11 @@ int main(int argc, char *argv[]) {
 			   std::string("minimum-size")) {
 				minimum_size_element = std::atoi(optarg);
 			}
+			if(std::string(long_options[option_index].name) ==
+			   std::string("speed")) {
+				speed = std::atoi(optarg);
+			}
+
 			break;
 
 		case 'v':
@@ -245,18 +256,13 @@ int main(int argc, char *argv[]) {
 
 	case Fractals::DAVINCI:
 		std::cout << "Da Vinci 3D tree!\n";
-		if(default_size)
-			size = minimum_size_element *
-				Fractals::DaVince3D::getSizeFromIteration(
-					iteration
-					);
-
 		confirm(no_confirm_flag, size);
 
 		data = new FFT3D::Data(size);
 		davince3d = new Fractals::DaVince3D(data, iteration);
 		davince3d->setMinimumSizeElement(minimum_size_element);
-		if (default_intteration && !default_size)
+		if(speed != 0) davince3d->setSpeed(speed);
+		if(default_intteration && !default_size)
 			davince3d->setMaximumItteration();
 		iteration = davince3d->getIteration();
 		std::cout << "Start generate the tree of da Vinci: " <<

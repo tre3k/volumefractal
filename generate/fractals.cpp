@@ -171,7 +171,7 @@ int DaVince3D::SizeElement(int age) {
 /* return size of central cube from step iteration "age" */
 int DaVince3D::SizeCentral(int age) {
 	if(age <= 1) return 1;
-	return 2 * SizeCentral(age-1);
+	return _speed * SizeCentral(age-1);
 }
 
 void DaVince3D::setMinimumSizeElement(int size) {
@@ -180,4 +180,8 @@ void DaVince3D::setMinimumSizeElement(int size) {
 
 void DaVince3D::setPosition(FFT3D::acoord pos) {
 	position = pos;
+}
+
+void DaVince3D::setSpeed(int speed) {
+	_speed = speed;
 }

@@ -44,6 +44,7 @@ namespace Fractals {
 		int minimum_size_element {1};
 
 		int _iteration {0};
+		int _speed {2};
 		FFT3D::acoord position {0, 0, 0};
 
 
@@ -65,13 +66,14 @@ namespace Fractals {
 		void setMaximumItteration(void);
 		/* This function returns the size of the array for
 		   a given number of iterations. */
-		static int getSizeFromIteration(int);
+		int getSizeFromIteration(int);
 
 		void setMinimumSizeElement(int);
 		void setPosition(FFT3D::acoord pos);
+		void setSpeed(int speed);
 
-		static int SizeElement(int age);
-		static int SizeCentral(int age);
+		int SizeElement(int age);
+		int SizeCentral(int age);
 	};
 };
 
