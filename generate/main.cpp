@@ -70,9 +70,12 @@ void help(char *progname) {
 		"Do not ask for any confirmation" << std::endl;
 	std::cout << "\t--minimum-size=<size>\r\t\t\t\t\t" <<
 		"Size of minimum element (for \"davinci\" fractal)" <<
+		std::endl <<
+		"\r\t\t\t\t\tRadius for \"sphere\"" <<
 		std::endl;
 	std::cout << "\t--speed=<value>\r\t\t\t\t\t" <<
-		"the rate of growth of the fractal, the rule of increase\n"
+		"the rate of growth of the fractal, the rule of increase" <<
+		std::endl <<
 		"\r\t\t\t\t\twith each iteration step" <<
 		std::endl;
 
@@ -243,7 +246,7 @@ int main(int argc, char *argv[]) {
 		data = new FFT3D::Data(size);
 		sphera = new Primitives::Sphera(data,
 						center,
-						size/2/iteration);
+						minimum_size_element);
 		sphera->paint();
 		break;
 
@@ -265,6 +268,8 @@ int main(int argc, char *argv[]) {
 		if(default_intteration && !default_size)
 			davince3d->setMaximumItteration();
 		iteration = davince3d->getIteration();
+		std::cout << "Minims element size: " << minimum_size_element <<
+			" pix" << std::endl;
 		std::cout << "Start generate the tree of da Vinci: " <<
 			iteration << " steps iteration" <<
 			std::endl;
