@@ -60,18 +60,24 @@ void help(char *progname) {
 		std::endl;
 	std::cout << "\t-f, --fractal=<fractal>\r\t\t\t\t\t"
 		"Selection of a fractal, such as:" << std::endl <<
-		"\r\t\t\t\t\t1. \"davinci\" - Da Vinci 3D tree" <<
+		"\r\t\t\t\t\t" << std::to_string(Fractals::PINHOLL) <<
+		". \"pinholl\" - Just one pixel in center" <<
 		std::endl <<
-		"\r\t\t\t\t\t2. \"pinholl\" - Just one pixel in center" <<
+		"\r\t\t\t\t\t" << std::to_string(Fractals::SPHERA) <<
+		". \"sphera\" - Draw sphera" <<
 		std::endl <<
-		"\r\t\t\t\t\t3. \"sphera\" - Draw sphera" <<
+		"\r\t\t\t\t\t" << std::to_string(Fractals::DAVINCI) <<
+		". \"davinci\" - Da Vinci 3D tree" <<
+		std::endl <<
+		"\r\t\t\t\t\t" << std::to_string(Fractals::SDAVINCI) <<
+		". \"sdavinci\" - Spherical tree Da Vinci 3D" <<
 		std::endl;
 	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
 		"Do not ask for any confirmation" << std::endl;
 	std::cout << "\t--minimum-size=<size>\r\t\t\t\t\t" <<
 		"Size of minimum element (for \"davinci\" fractal)" <<
 		std::endl <<
-		"\r\t\t\t\t\tRadius for \"sphere\"" <<
+		"\r\t\t\t\t\tDiameter for \"sphere\"" <<
 		std::endl;
 	std::cout << "\t--speed=<value>\r\t\t\t\t\t" <<
 		"the rate of growth of the fractal, the rule of increase" <<
@@ -119,10 +125,11 @@ int main(int argc, char *argv[]) {
 	int fractal {0};
 	int speed {0};
 
-	int minimum_size_element {1};
+	int minimum_size_element {10};
 
 	FFT3D::Data *data;
-	Fractals::DaVince3D *davince3d;
+	Fractals::DaVinci3D *davinci3d;
+	Fractals::SDaVinci3D *sdavinci3d;
 
 	Primitives::Pinholl *pinholl;
 	Primitives::Sphera *sphera;
@@ -136,7 +143,7 @@ int main(int argc, char *argv[]) {
 		{"help", no_argument, 0, 'h'},
 		{"size", required_argument, 0, 's'},
 		{"output", required_argument, 0, 'o'},
-		{"itteration", required_argument, 0, 'i'},
+		{"iteration", required_argument, 0, 'i'},
 		{"fractal", required_argument, 0, 'f'},
 		{"noconfirm", no_argument, &no_confirm_flag, 1},
 		{"minimum-size", required_argument, 0, 0},
@@ -196,19 +203,28 @@ int main(int argc, char *argv[]) {
 
 		case 'f':
 			str_fractal = std::string(optarg);
-			if(str_fractal == "davinci" || str_fractal == "1") {
+			if(str_fractal == "davinci" ||
+			   str_fractal == std::to_string(Fractals::DAVINCI)) {
 				str_fractal = "davinci";
 				fractal = Fractals::DAVINCI;
 			}
 
-			if(str_fractal == "pinholl" || str_fractal == "2"){
+			if(str_fractal == "pinholl" ||
+			   str_fractal == std::to_string(Fractals::PINHOLL)){
 				str_fractal = "pinholl";
 				fractal = Fractals::PINHOLL;
 			}
 
-			if(str_fractal == "sphera" || str_fractal == "3") {
+			if(str_fractal == "sphera" ||
+			   str_fractal == std::to_string(Fractals::SPHERA)) {
 				str_fractal = "sphera";
 				fractal = Fractals::SPHERA;
+			}
+
+			if(str_fractal == "sdavinci" ||
+			   str_fractal == std::to_string(Fractals::SDAVINCI)) {
+				str_fractal = "sdavinci";
+				fractal = Fractals::SDAVINCI;
 			}
 
 			break;
@@ -246,7 +262,7 @@ int main(int argc, char *argv[]) {
 		data = new FFT3D::Data(size);
 		sphera = new Primitives::Sphera(data,
 						center,
-						minimum_size_element);
+						minimum_size_element/2);
 		sphera->paint();
 		break;
 
@@ -257,33 +273,63 @@ int main(int argc, char *argv[]) {
 		pinholl->paint();
 		break;
 
-	case Fractals::DAVINCI:
-		std::cout << "Da Vinci 3D tree!\n";
+	case Fractals::SDAVINCI:
+		std::cout << "Spherical tree Da Vinci 3D!" << std::endl;
 		confirm(no_confirm_flag, size);
 
 		data = new FFT3D::Data(size);
-		davince3d = new Fractals::DaVince3D(data, iteration);
-		davince3d->setMinimumSizeElement(minimum_size_element);
-		if(speed != 0) davince3d->setSpeed(speed);
+		sdavinci3d = new Fractals::SDaVinci3D(data, iteration);
+		sdavinci3d->setMinimumSizeElement(minimum_size_element/2);
+		if(speed != 0) sdavinci3d->setSpeed(speed);
 		if(default_intteration && !default_size)
-			davince3d->setMaximumItteration();
-		iteration = davince3d->getIteration();
+			sdavinci3d->setMaximumIteration();
+		iteration = sdavinci3d->getIteration();
+		std::cout << "Minimum sphere radius: " <<
+			int(minimum_size_element/2) <<
+			" pix " <<
+			"(diamenter: " <<
+			int(minimum_size_element) <<
+			" pix)" << std::endl;
+		std::cout << "Start generate the spherical tree" <<
+			"of da Vinci: " <<
+			iteration << " steps iteration" <<
+			std::endl;
+		sdavinci3d->setPosition(
+			{data->size_x()/2,
+			 data->size_y()/2,
+			 data->size_z()/2}
+			);
+
+		sdavinci3d->generate();
+		break;
+
+	case Fractals::DAVINCI:
+		std::cout << "Da Vinci 3D tree!" << std::endl;
+		confirm(no_confirm_flag, size);
+
+		data = new FFT3D::Data(size);
+		davinci3d = new Fractals::DaVinci3D(data, iteration);
+		davinci3d->setMinimumSizeElement(minimum_size_element);
+		if(speed != 0) davinci3d->setSpeed(speed);
+		if(default_intteration && !default_size)
+			davinci3d->setMaximumIteration();
+		iteration = davinci3d->getIteration();
 		std::cout << "Minims element size: " << minimum_size_element <<
 			" pix" << std::endl;
 		std::cout << "Start generate the tree of da Vinci: " <<
 			iteration << " steps iteration" <<
 			std::endl;
-		davince3d->setPosition(
+		davinci3d->setPosition(
 			{data->size_x()/2 -
 			 minimum_size_element *
-			 davince3d->SizeElement(iteration)/2,
+			 davinci3d->SizeElement(iteration)/2,
 			 data->size_y()/2 -
 			 minimum_size_element *
-			 davince3d->SizeElement(iteration)/2,
+			 davinci3d->SizeElement(iteration)/2,
 			 data->size_z()/2 -
 			 minimum_size_element *
-			 davince3d->SizeElement(iteration)/2});
-		davince3d->generate();
+			 davinci3d->SizeElement(iteration)/2});
+		davinci3d->generate();
 		break;
 
 	}

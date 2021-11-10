@@ -79,6 +79,7 @@ namespace Primitives {
 		       int radius = 5);
 
 		void setRadius(int r);
+		void setPosition(FFT3D::acoord pos);
 		void paint(void);
 	};
 

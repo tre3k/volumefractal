@@ -32,10 +32,11 @@ namespace Fractals {
 		FNULL,
 		PINHOLL,           // from Primitives namespace
 		SPHERA,
-		DAVINCI
+		DAVINCI,
+		SDAVINCI
 	};
 
-	class DaVince3D {
+	class DaVinci3D {
 	protected:
 		FFT3D::Data *_data;
 
@@ -48,7 +49,7 @@ namespace Fractals {
 		FFT3D::acoord position {0, 0, 0};
 
 
-		void element(FFT3D::acoord pos,
+		virtual void element(FFT3D::acoord pos,
 			     int size,             // size of minimum element
 			     int age);
 		/* if you want know full size,
@@ -56,14 +57,14 @@ namespace Fractals {
 
 
 	public:
-		DaVince3D(FFT3D::Data *data, int iteration = 1);
+		DaVinci3D(FFT3D::Data *data, int iteration = 1);
 		void setIteration(int iteration);
 		int getIteration(void);
 		void generate(void);
 
 		/* This function determines the maximum number
 		   of iterations over the size of the array _data */
-		void setMaximumItteration(void);
+		void setMaximumIteration(void);
 		/* This function returns the size of the array for
 		   a given number of iterations. */
 		int getSizeFromIteration(int);
@@ -74,6 +75,17 @@ namespace Fractals {
 
 		int SizeElement(int age);
 		int SizeCentral(int age);
+	};
+
+
+	class SDaVinci3D : public DaVinci3D {
+	public:
+		SDaVinci3D(FFT3D::Data *data, int iteration = 1);
+
+	protected:
+		void element(FFT3D::acoord pos,
+			     int size,
+			     int age) override;
 	};
 };
 

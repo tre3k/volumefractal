@@ -25,12 +25,12 @@
 
 using namespace Fractals;
 
-DaVince3D::DaVince3D(FFT3D::Data *data, int iteration) {
+DaVinci3D::DaVinci3D(FFT3D::Data *data, int iteration) {
 	_data = data;
 	setIteration(iteration);
 }
 
-void DaVince3D::element(FFT3D::acoord pos,
+void DaVinci3D::element(FFT3D::acoord pos,
 			 int size,
 			 int age) {
 
@@ -133,21 +133,21 @@ void DaVince3D::element(FFT3D::acoord pos,
 	central_cube.paint();
 }
 
-void DaVince3D::generate() {
+void DaVinci3D::generate() {
 	element(position,
 		minimum_size_element,
 		_iteration);
 }
 
-void DaVince3D::setIteration(int itteration) {
-	_iteration = itteration;
+void DaVinci3D::setIteration(int iteration) {
+	_iteration = iteration;
 }
 
-int DaVince3D::getIteration() {
+int DaVinci3D::getIteration() {
 	return _iteration;
 }
 
-void DaVince3D::setMaximumItteration() {
+void DaVinci3D::setMaximumIteration() {
 	_iteration = 1;
 	int size = _data->size_x();
 	while(size >= minimum_size_element * SizeElement(_iteration)){
@@ -156,32 +156,155 @@ void DaVince3D::setMaximumItteration() {
 	_iteration --;
 }
 
-int DaVince3D::getSizeFromIteration(int iteration) {
+int DaVinci3D::getSizeFromIteration(int iteration) {
 	return SizeElement(iteration);
 }
 
 /* return size of element (central cube + 8 elements (n-1) step)
    from step iteration "age" */
-int DaVince3D::SizeElement(int age) {
+int DaVinci3D::SizeElement(int age) {
 	if(age <= 0) return 0;
 	if(age == 1) return 1;
 	return SizeCentral(age) + 2 * SizeElement(age-1);
 }
 
 /* return size of central cube from step iteration "age" */
-int DaVince3D::SizeCentral(int age) {
+int DaVinci3D::SizeCentral(int age) {
 	if(age <= 1) return 1;
 	return _speed * SizeCentral(age-1);
 }
 
-void DaVince3D::setMinimumSizeElement(int size) {
+void DaVinci3D::setMinimumSizeElement(int size) {
 	minimum_size_element = size;
 }
 
-void DaVince3D::setPosition(FFT3D::acoord pos) {
+void DaVinci3D::setPosition(FFT3D::acoord pos) {
 	position = pos;
 }
 
-void DaVince3D::setSpeed(int speed) {
+void DaVinci3D::setSpeed(int speed) {
 	_speed = speed;
+}
+
+
+/* Spherical DaVinci */
+SDaVinci3D::SDaVinci3D(FFT3D::Data *data, int iteration) :
+	DaVinci3D(data, iteration){
+
+}
+
+
+void SDaVinci3D::element(FFT3D::acoord pos,
+			     int size,
+			     int age) {
+
+	int c_size = size * SizeCentral(age);
+	// SizeElement - size of "Cube" side,
+	// d(diagonal) = sqrt(3) * r(side)
+	int shift = sqrt(1.0/3.0) * c_size +
+		size * sqrt(1.0/3.0) * SizeElement(age-1);
+
+	if(age == 2) {
+		std::vector<Primitives::Sphera> spheres;
+		for(int i=0; i < 8; i++){
+			Primitives::Sphera sphere(_data);
+			sphere.setRadius(size);
+			spheres.push_back(sphere);
+		}
+		spheres[0].setPosition({
+				pos.i - shift,
+				pos.j - shift,
+				pos.k - shift,
+			});
+		spheres[1].setPosition({
+				pos.i + shift,
+				pos.j - shift,
+				pos.k - shift,
+			});
+		spheres[2].setPosition({
+				pos.i - shift,
+				pos.j + shift,
+				pos.k - shift,
+			});
+		spheres[3].setPosition({
+				pos.i + shift,
+				pos.j + shift,
+				pos.k - shift,
+			});
+		spheres[4].setPosition({
+				pos.i - shift,
+				pos.j - shift,
+				pos.k + shift,
+			});
+		spheres[5].setPosition({
+				pos.i + shift,
+				pos.j - shift,
+				pos.k + shift,
+			});
+		spheres[6].setPosition({
+				pos.i - shift,
+				pos.j + shift,
+				pos.k + shift,
+			});
+		spheres[7].setPosition({
+				pos.i + shift,
+				pos.j + shift,
+				pos.k + shift,
+			});
+		for(int i=0; i<8; i++) spheres[i].paint();
+	}
+
+	if(age > 2) {
+		element({
+				pos.i - shift,
+				pos.j - shift,
+				pos.k - shift,
+			}
+			, size, age-1);
+		element({
+				pos.i + shift,
+				pos.j - shift,
+				pos.k - shift,
+			}, size, age-1);
+		element({
+				pos.i - shift,
+				pos.j + shift,
+				pos.k - shift,
+			}, size, age-1);
+		element({
+				pos.i + shift,
+				pos.j + shift,
+				pos.k - shift,
+			}, size, age-1);
+		element({
+				pos.i - shift,
+				pos.j - shift,
+				pos.k + shift,
+			}, size, age-1);
+		element({
+				pos.i + shift,
+				pos.j - shift,
+				pos.k + shift,
+			}, size, age-1);
+		element({
+				pos.i - shift,
+				pos.j + shift,
+				pos.k + shift,
+			}, size, age-1);
+		element({
+				pos.i + shift,
+				pos.j + shift,
+				pos.k + shift,
+			}, size, age-1);
+	}
+
+	Primitives::Sphera central_sphera(_data);
+	central_sphera.setRadius(c_size);
+	central_sphera.setPosition({
+			pos.i,
+			pos.j,
+			pos.k,
+		});
+	central_sphera.paint();
+
 }

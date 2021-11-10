@@ -124,7 +124,9 @@ void Sphera::paint() {
 	}
 }
 
-
+void Sphera::setPosition(FFT3D::acoord pos) {
+	_center = pos;
+}
 
 Pinholl::Pinholl(FFT3D::Data *data,
 		 FFT3D::acoord center
