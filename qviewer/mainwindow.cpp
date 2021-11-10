@@ -53,8 +53,8 @@ void MainWindow::BuildMenu(){
         menu_bar.open = new QAction("&Open");
         menu_bar.file_menu->addAction(menu_bar.open);
 
-        menu_bar.export_dat = new QAction("&Export intencity");
-        menu_bar.file_menu->addAction(menu_bar.export_dat);
+        menu_bar.export_pngs = new QAction("&Export png for gif");
+        menu_bar.file_menu->addAction(menu_bar.export_pngs);
 
 
         menu_bar.exit= new QAction("&Exit");
@@ -63,8 +63,8 @@ void MainWindow::BuildMenu(){
         this->setMenuBar(menu_bar.menu_bar);
         connect(menu_bar.open, &QAction::triggered,
                 this, &MainWindow::OpenFile);
-        connect(menu_bar.export_dat, &QAction::triggered,
-        this, &MainWindow::ExportIntencityDat);
+        connect(menu_bar.export_pngs, &QAction::triggered,
+		this, &MainWindow::ExportPngs);
         connect(menu_bar.exit, &QAction::triggered,
                 this, &MainWindow::close);
 }
@@ -88,8 +88,18 @@ void MainWindow::OpenFile(){
         amount->setSize(size);
 }
 
-void MainWindow::ExportIntencityDat() {
+void MainWindow::ExportPngs() {
+        QString filename;
+        QString dir = QFileDialog::getExistingDirectory();
+        if(dir == "") return;
+        for(int i = viewer->slider->minimum();
+	    i < viewer->slider->maximum();
+	    i ++) {
 
+                viewer->slider->setValue(i);
+                filename = dir + "/" + QString::number(i)+".png";
+                viewer->plot_case_ampl->plot2D->savePng(filename);
+        }
 }
 
 /* VIEWER Widget */

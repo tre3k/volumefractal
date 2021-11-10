@@ -48,14 +48,14 @@ namespace Widgets{
         protected:
 		QHBoxLayout *layout;
 		QVBoxLayout *layout_depth;
-		iCasePlot2D *plot_case_ampl;
-		iCasePlot2D *plot_case_phase;
 		QString _filename;
 		FFT3D::Data2D *_data;
-		QSlider *slider;
 		QSpinBox *spin_box_depth;
 
 	public:
+                QSlider *slider;
+                iCasePlot2D *plot_case_ampl;
+                iCasePlot2D *plot_case_phase;
 		Viewer(QWidget *parent = nullptr);
 
 	public slots:
@@ -100,7 +100,7 @@ private:
                 QMenuBar *menu_bar;
                 QMenu *file_menu;
                 QAction *open;
-                QAction *export_dat;
+                QAction *export_pngs;
                 QAction *exit;
         } menu_bar;
 
@@ -117,7 +117,7 @@ public:
 
 public slots:
         void OpenFile(void);
-        void ExportIntencityDat(void);
+        void ExportPngs(void);
 
 signals:
 
