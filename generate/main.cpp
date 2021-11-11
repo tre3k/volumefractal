@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 	int iteration = 3;
 	bool default_intteration {true};
 
-	std::string output_file_name = "out.raw";
+	std::string output_file_name = "";
 	bool default_output_file_name {true};
 
 	std::string str_fractal;
@@ -338,6 +338,11 @@ int main(int argc, char *argv[]) {
 		output_file_name <<
 		" (" << FFT3D::Data::human_size(data->FileSize()) << ")..." <<
 		std::endl;
+	if(default_output_file_name) {
+		output_file_name = str_fractal + "-" +
+			std::to_string(iteration) + "-" +
+			std::to_string(size) + ".raw";
+	}
 	data->WriteToRawFile(output_file_name);
 	std::cout << "done." << std::endl;
 

@@ -291,7 +291,7 @@ int main(int argc,char *argv[]) {
 		return 0;
 	}
 
-	if(out_filename == "") out_filename = "out.raw";
+	if(out_filename == "") out_filename = "fft" + in_filename;
 
 	data.ReadFromRawFile(in_filename);
 	auto fft = new FFT3D::FastFourierTransform3D(&data);
