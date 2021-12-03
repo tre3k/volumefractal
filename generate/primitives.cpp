@@ -77,6 +77,19 @@ void Cube::paint() {
 	}
 }
 
+CubeWhite::CubeWhite(FFT3D::Data *data) : Cube(data) {
+}
+
+void CubeWhite::paint(){
+	for(int i=_key.i; i<_a+_key.i; i++) {
+		for(int j=_key.j; j<_a+_key.j; j++) {
+			for(int k=_key.k; k<_a+_key.k; k++) {
+				_data->setValue(i, j, k, {0.0,0});
+			}
+		}
+	}
+}
+
 
 Sphera::Sphera(FFT3D::Data *data,
 		    FFT3D::acoord center,

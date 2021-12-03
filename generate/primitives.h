@@ -69,6 +69,12 @@ namespace Primitives {
 
 	};
 
+	class CubeWhite : public Cube {
+	public:
+		CubeWhite(FFT3D::Data *data = nullptr);
+		void paint(void);
+	};
+
 
 	class Sphera : public Primitive {
 	protected:
@@ -82,7 +88,6 @@ namespace Primitives {
 		void setPosition(FFT3D::acoord pos);
 		void paint(void);
 	};
-
 
 	class Pinholl : public Primitive {
 	public:
