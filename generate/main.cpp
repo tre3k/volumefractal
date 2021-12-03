@@ -74,7 +74,11 @@ void help(char *progname) {
 		std::endl <<
 		"\r\t\t\t\t\t" << std::to_string(Fractals::VISHEK) <<
 		". \"vishek\" - Vishek fractal" <<
+		std::endl <<
+		"\r\t\t\t\t\t" << std::to_string(Fractals::VMULD) <<
+		". \"vmuld\" - Vishek multiplication with Davinchi3D" <<
 		std::endl;
+
 
 	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
 		"Do not ask for any confirmation" << std::endl;
@@ -135,6 +139,7 @@ int main(int argc, char *argv[]) {
 	Fractals::DaVinci3D *davinci3d;
 	Fractals::SDaVinci3D *sdavinci3d;
 	Fractals::Vishek3D *vishek3d;
+	Fractals::VmulD3D *vmuld3d;
 
 	Primitives::Pinholl *pinholl;
 	Primitives::Sphera *sphera;
@@ -241,6 +246,11 @@ int main(int argc, char *argv[]) {
 				fractal = Fractals::VISHEK;
 			}
 
+			if(str_fractal == "vmuld" ||
+			   str_fractal == std::to_string(Fractals::VMULD)) {
+				str_fractal = "vmuld";
+				fractal = Fractals::VMULD;
+			}
 			break;
 
 		case '?':
@@ -344,6 +354,37 @@ int main(int argc, char *argv[]) {
 			 minimum_size_element *
 			 davinci3d->SizeElement(iteration)/2});
 		davinci3d->generate();
+		break;
+
+	case Fractals::VMULD:
+		std::cout << "generate Vishek multiplication DaVinci"
+			  << std::endl;
+		confirm(no_confirm_flag, size);
+
+		data = new FFT3D::Data(size);
+		vmuld3d = new Fractals::VmulD3D(data, iteration);
+		vmuld3d->setMinimumSizeElement(minimum_size_element);
+		if(speed != 0) vmuld3d->setSpeed(speed);
+		if(default_intteration && !default_size)
+			vmuld3d->setMaximumIteration();
+		iteration = vmuld3d->getIteration();
+		std::cout << "Minims element size: " << minimum_size_element <<
+			" pix" << std::endl;
+		std::cout << "Start generate Vishek and da Vinci: " <<
+			iteration << " steps iteration" <<
+			std::endl;
+		vmuld3d->setPosition(
+			{data->size_x()/2 -
+			 minimum_size_element *
+			 vmuld3d->SizeElement(iteration)/2,
+			 data->size_y()/2 -
+			 minimum_size_element *
+			 vmuld3d->SizeElement(iteration)/2,
+			 data->size_z()/2 -
+			 minimum_size_element *
+			 vmuld3d->SizeElement(iteration)/2});
+		vmuld3d->generate();
+
 		break;
 
 	case Fractals::VISHEK:

@@ -34,7 +34,8 @@ namespace Fractals {
 		SPHERA,
 		DAVINCI,
 		SDAVINCI,
-		VISHEK
+		VISHEK,
+		VMULD
 	};
 
 	class DaVinci3D {
@@ -78,7 +79,6 @@ namespace Fractals {
 		int SizeCentral(int age);
 	};
 
-
 	class SDaVinci3D : public DaVinci3D {
 	public:
 		SDaVinci3D(FFT3D::Data *data, int iteration = 1);
@@ -88,7 +88,6 @@ namespace Fractals {
 			     int size,
 			     int age) override;
 	};
-
 
 	class Vishek3D {
 	public:
@@ -111,6 +110,19 @@ namespace Fractals {
 		void element(FFT3D::acoord pos,
 			     int size,
 			     int age);
+
+	};
+
+	/* Vishek 3D multiplication with Davinci */
+	class VmulD3D : public DaVinci3D {
+	public:
+		VmulD3D(FFT3D::Data *data, int iteration = 1);
+		void setVishekIteration(int iteration = 2);
+	protected:
+		int vishekIteraption_ {3};
+		void element(FFT3D::acoord pos,
+			     int size,
+			     int age) override;
 
 	};
 

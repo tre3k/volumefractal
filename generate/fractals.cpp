@@ -37,6 +37,10 @@ void DaVinci3D::element(FFT3D::acoord pos,
 	int shift = size * SizeElement(age-1);
 	int c_size = size * SizeCentral(age);
 
+	/*
+	 * Реструктуризовать код, чтобы не реализовывать изменение
+	 * координат каждый раз в потомках
+	 */
 	if(age == 2) {
 		std::vector<Primitives::Cube> cubes;
 		for(int i=0; i < 8; i++){
@@ -402,7 +406,6 @@ void Vishek3D::element(FFT3D::acoord pos,
 				age - 1);
 		}
 	}
-
 }
 
 void Vishek3D::generateWhiteCubes(FFT3D::acoord pos, int size) {
@@ -530,4 +533,115 @@ void Vishek3D::setSize(int size) {
 
 void Vishek3D::setIteration(int iteration) {
 	iteration_ = iteration;
+}
+
+VmulD3D::VmulD3D(FFT3D::Data *data, int iteration) :
+	DaVinci3D(data, iteration) {
+}
+
+void VmulD3D::setVishekIteration(int iteration) {
+	vishekIteraption_ = iteration;
+}
+
+void VmulD3D::element(FFT3D::acoord pos,
+		      int size,
+		      int age) {
+	int shift = size * SizeElement(age-1);
+	int c_size = size * SizeCentral(age);
+
+	if(age == 2) {
+		std::vector<Fractals::Vishek3D> visheks;
+		for(int i=0; i < 8; i++){
+			Fractals::Vishek3D vishek(_data, vishekIteraption_);
+			vishek.setSize(size);
+			visheks.push_back(vishek);
+		}
+		visheks[0].setPosition(pos);
+		visheks[1].setPosition({
+				pos.i + c_size + shift,
+				pos.j,
+				pos.k,
+			});
+		visheks[2].setPosition({
+				pos.i,
+				pos.j + c_size + shift,
+				pos.k,
+			});
+		visheks[3].setPosition({
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
+				pos.k,
+			});
+		visheks[4].setPosition({
+				pos.i,
+				pos.j,
+				pos.k + c_size + shift,
+			});
+		visheks[5].setPosition({
+				pos.i + c_size + shift,
+				pos.j,
+				pos.k + c_size + shift,
+			});
+		visheks[6].setPosition({
+				pos.i,
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
+			});
+		visheks[7].setPosition({
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
+			});
+
+		for(auto vishek : visheks) vishek.generate();
+	}
+
+	if(age > 2) {
+		element(pos, size, age-1);
+		element({
+				pos.i + c_size + shift,
+				pos.j,
+				pos.k,
+			}, size, age-1);
+		element({
+				pos.i,
+				pos.j + c_size + shift,
+				pos.k,
+			}, size, age-1);
+		element({
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
+				pos.k,
+			}, size, age-1);
+		element({
+				pos.i,
+				pos.j,
+				pos.k + c_size + shift,
+			}, size, age-1);
+		element({
+				pos.i + c_size + shift,
+				pos.j,
+				pos.k + c_size + shift,
+			}, size, age-1);
+		element({
+				pos.i,
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
+			}, size, age-1);
+		element({
+				pos.i + c_size + shift,
+				pos.j + c_size + shift,
+				pos.k + c_size + shift,
+			}, size, age-1);
+	}
+
+
+	Fractals::Vishek3D centralVishek(_data, vishekIteraption_);
+	centralVishek.setSize(c_size);
+	centralVishek.setPosition({
+			pos.i + shift,
+			pos.j + shift,
+			pos.k + shift,
+		});
+	centralVishek.generate();
 }
