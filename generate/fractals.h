@@ -33,7 +33,8 @@ namespace Fractals {
 		PINHOLL,           // from Primitives namespace
 		SPHERA,
 		DAVINCI,
-		SDAVINCI
+		SDAVINCI,
+		VISHEK
 	};
 
 	class DaVinci3D {
@@ -87,6 +88,32 @@ namespace Fractals {
 			     int size,
 			     int age) override;
 	};
+
+
+	class Vishek3D {
+	public:
+		Vishek3D(FFT3D::Data *data, int iteration = 1);
+		void generate(void);
+		void setPosition(FFT3D::acoord pos);
+		void setSize(int size);
+		void setIteration(int iteration);
+		static const int permitedSizes[];
+
+	protected:
+		FFT3D::Data *_data;
+
+		FFT3D::acoord position_ {0, 0, 0};
+		int size_ {1};
+		int iteration_ {1};
+
+		void generateWhiteCubes(FFT3D::acoord pos,
+					int size);
+		void element(FFT3D::acoord pos,
+			     int size,
+			     int age);
+
+	};
+
 };
 
 

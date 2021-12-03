@@ -71,7 +71,11 @@ void help(char *progname) {
 		std::endl <<
 		"\r\t\t\t\t\t" << std::to_string(Fractals::SDAVINCI) <<
 		". \"sdavinci\" - Spherical tree Da Vinci 3D" <<
+		std::endl <<
+		"\r\t\t\t\t\t" << std::to_string(Fractals::VISHEK) <<
+		". \"vishek\" - Vishek fractal" <<
 		std::endl;
+
 	std::cout << "\t--noconfirm\r\t\t\t\t\t" <<
 		"Do not ask for any confirmation" << std::endl;
 	std::cout << "\t--minimum-size=<size>\r\t\t\t\t\t" <<
@@ -130,6 +134,7 @@ int main(int argc, char *argv[]) {
 	FFT3D::Data *data;
 	Fractals::DaVinci3D *davinci3d;
 	Fractals::SDaVinci3D *sdavinci3d;
+	Fractals::Vishek3D *vishek3d;
 
 	Primitives::Pinholl *pinholl;
 	Primitives::Sphera *sphera;
@@ -225,6 +230,15 @@ int main(int argc, char *argv[]) {
 			   str_fractal == std::to_string(Fractals::SDAVINCI)) {
 				str_fractal = "sdavinci";
 				fractal = Fractals::SDAVINCI;
+			}
+
+
+			// Сделать функцию Int->String и подставить её
+			// везде где имя фрактала
+			if(str_fractal == "vishek" ||
+			   str_fractal == std::to_string(Fractals::VISHEK)) {
+				str_fractal = "vishek";
+				fractal = Fractals::VISHEK;
 			}
 
 			break;
@@ -330,6 +344,20 @@ int main(int argc, char *argv[]) {
 			 minimum_size_element *
 			 davinci3d->SizeElement(iteration)/2});
 		davinci3d->generate();
+		break;
+
+	case Fractals::VISHEK:
+		data = new FFT3D::Data(size);
+		vishek3d = new Fractals::Vishek3D(data, iteration);
+		int ps = minimum_size_element *
+			Fractals::Vishek3D::permitedSizes[iteration];
+		vishek3d->setSize(ps);
+		vishek3d->setPosition({
+				(int)((size - ps) / 2),
+				(int)((size - ps) / 2),
+				(int)((size - ps) / 2)
+			});
+		vishek3d->generate();
 		break;
 
 	}

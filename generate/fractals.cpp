@@ -80,6 +80,7 @@ void DaVinci3D::element(FFT3D::acoord pos,
 				pos.j + c_size + shift,
 				pos.k + c_size + shift,
 			});
+		// Использовать auto cube : cubes
 		for(int i=0; i<8; i++) cubes[i].paint();
 	}
 
@@ -307,4 +308,226 @@ void SDaVinci3D::element(FFT3D::acoord pos,
 		});
 	central_sphera.paint();
 
+}
+
+
+const int Vishek3D::permitedSizes[]
+{0, 3, 9, 27, 81, 243, 729, 2187, 6561, 19683};
+
+Vishek3D::Vishek3D(FFT3D::Data *data, int iteration) {
+	_data = data;
+	setIteration(iteration);
+}
+
+void Vishek3D::element(FFT3D::acoord pos,
+		       int size,
+		       int age) {
+	if(age <= 0) return;
+
+	int d = size % 3;
+	size /= 3;
+	size += d;
+
+	std::vector<FFT3D::acoord> blackCubePositions;
+
+	if(age == 1) generateWhiteCubes(pos, size);
+
+	if(age > 1) {
+		for(int i = 0; i < 9; i++) {
+			FFT3D::acoord blackCubePosition;
+			blackCubePositions.push_back(blackCubePosition);
+		}
+
+		/* front side */
+		blackCubePositions[0] = {
+			pos.i,
+			pos.j,
+			pos.k
+		};
+
+		blackCubePositions[1] = {
+			pos.i + 2 * size,
+			pos.j,
+			pos.k
+		};
+
+		blackCubePositions[2] = {
+			pos.i + 2 * size,
+			pos.j + 2 * size,
+			pos.k
+		};
+
+		blackCubePositions[3] = {
+			pos.i,
+			pos.j + 2 * size,
+			pos.k
+		};
+
+		/* central cube */
+		blackCubePositions[4] = {
+			pos.i + size,
+			pos.j + size,
+			pos.k + size
+		};
+
+		/* back side */
+		blackCubePositions[5] = {
+			pos.i,
+			pos.j,
+			pos.k + 2 * size
+		};
+
+		blackCubePositions[6] = {
+			pos.i + 2 * size,
+			pos.j,
+			pos.k + 2 * size
+		};
+
+		blackCubePositions[7] = {
+			pos.i + 2 * size,
+			pos.j + 2 * size,
+			pos.k + 2 * size
+		};
+
+		blackCubePositions[8] = {
+			pos.i,
+			pos.j + 2 * size,
+			pos.k + 2 * size
+		};
+
+		for(auto blackCubePosition : blackCubePositions) {
+			generateWhiteCubes(blackCubePosition, size);
+			element(blackCubePosition,
+				size,
+				age - 1);
+		}
+	}
+
+}
+
+void Vishek3D::generateWhiteCubes(FFT3D::acoord pos, int size) {
+	std::vector<Primitives::CubeWhite> whiteCubes;
+	for(int i = 0; i < 18; i++) {
+		Primitives::CubeWhite cube(_data);
+		cube.setSize(size);
+		whiteCubes.push_back(cube);
+	}
+	/* front side */
+	whiteCubes[0].setKeyPosition({
+			pos.i + size,
+			pos.j,
+			pos.k
+		});
+	whiteCubes[1].setKeyPosition({
+			pos.i,
+			pos.j + size,
+			pos.k
+		});
+	whiteCubes[2].setKeyPosition({
+			pos.i + size,
+			pos.j + 2 * size,
+			pos.k
+		});
+	whiteCubes[3].setKeyPosition({
+			pos.i + 2 * size,
+			pos.j + size,
+			pos.k
+		});
+	whiteCubes[4].setKeyPosition({
+			pos.i + size,
+			pos.j + size,
+			pos.k
+		});
+
+	/* central side */
+	whiteCubes[5].setKeyPosition({
+			pos.i + size,
+			pos.j,
+			pos.k + size
+		});
+	whiteCubes[6].setKeyPosition({
+			pos.i,
+			pos.j + size,
+			pos.k + size
+		});
+	whiteCubes[7].setKeyPosition({
+			pos.i + size,
+			pos.j + 2 * size,
+			pos.k + size
+		});
+	whiteCubes[8].setKeyPosition({
+			pos.i + 2 * size,
+			pos.j + size,
+			pos.k + size
+		});
+	whiteCubes[9].setKeyPosition({
+			pos.i,
+			pos.j,
+			pos.k + size
+		});
+	whiteCubes[10].setKeyPosition({
+			pos.i + 2 * size,
+			pos.j,
+			pos.k + size
+		});
+	whiteCubes[11].setKeyPosition({
+			pos.i + 2 * size,
+			pos.j + 2 * size,
+			pos.k + size
+		});
+	whiteCubes[12].setKeyPosition({
+			pos.i,
+			pos.j + 2 * size,
+			pos.k + size
+		});
+
+	/* back side */
+	whiteCubes[13].setKeyPosition({
+			pos.i + size,
+			pos.j,
+			pos.k + 2 * size
+		});
+	whiteCubes[14].setKeyPosition({
+			pos.i,
+			pos.j + size,
+			pos.k + 2 * size
+		});
+	whiteCubes[15].setKeyPosition({
+			pos.i + size,
+			pos.j + 2 * size,
+			pos.k + 2 * size
+		});
+	whiteCubes[16].setKeyPosition({
+			pos.i + 2 * size,
+			pos.j + size,
+			pos.k + 2 * size
+		});
+	whiteCubes[17].setKeyPosition({
+			pos.i + size,
+			pos.j + size,
+			pos.k + 2 * size
+		});
+
+	for(auto cube : whiteCubes) cube.paint();
+}
+
+void Vishek3D::generate() {
+	Primitives::Cube allSpaceCube(_data, size_);
+	allSpaceCube.setKeyPosition(position_);
+	allSpaceCube.setSize(size_);
+	allSpaceCube.paint();
+
+	element(position_, size_, iteration_);
+}
+
+void Vishek3D::setPosition(FFT3D::acoord pos) {
+	position_ = pos;
+}
+
+void Vishek3D::setSize(int size) {
+	size_ = size;
+}
+
+void Vishek3D::setIteration(int iteration) {
+	iteration_ = iteration;
 }
